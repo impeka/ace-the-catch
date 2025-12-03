@@ -9,33 +9,34 @@
  * Text Domain: ace-the-catch
  * Domain Path: /languages
  *
- * @package Ace_The_Catch
+ * @package Impeka\Lotto
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+namespace Impeka\Lotto;
+
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ACE_THE_CATCH_VERSION', '0.1.0' );
-define( 'ACE_THE_CATCH_FILE', __FILE__ );
-define( 'ACE_THE_CATCH_PATH', plugin_dir_path( __FILE__ ) );
-define( 'ACE_THE_CATCH_URL', plugin_dir_url( __FILE__ ) );
+define( 'LOTTO_VERSION', '0.1.0' );
+define( 'LOTTO_FILE', __FILE__ );
+define( 'LOTTO_PATH', \plugin_dir_path( __FILE__ ) );
+define( 'LOTTO_URL', \plugin_dir_url( __FILE__ ) );
 
-require_once ACE_THE_CATCH_PATH . 'includes/class-ace-the-catch-activator.php';
-require_once ACE_THE_CATCH_PATH . 'includes/class-ace-the-catch-deactivator.php';
-require_once ACE_THE_CATCH_PATH . 'includes/class-ace-the-catch.php';
+require_once LOTTO_PATH . 'includes/class-activator.php';
+require_once LOTTO_PATH . 'includes/class-deactivator.php';
+require_once LOTTO_PATH . 'includes/interface-payment-processor.php';
+require_once LOTTO_PATH . 'includes/class-payment-processor-factory.php';
+require_once LOTTO_PATH . 'includes/interface-geo-locator.php';
+require_once LOTTO_PATH . 'includes/class-geo-locator-factory.php';
+require_once LOTTO_PATH . 'includes/class-plugin.php';
 
-register_activation_hook( ACE_THE_CATCH_FILE, array( 'Ace_The_Catch_Activator', 'activate' ) );
-register_deactivation_hook( ACE_THE_CATCH_FILE, array( 'Ace_The_Catch_Deactivator', 'deactivate' ) );
+\register_activation_hook( LOTTO_FILE, array( __NAMESPACE__ . '\\Activator', 'activate' ) );
+\register_deactivation_hook( LOTTO_FILE, array( __NAMESPACE__ . '\\Deactivator', 'deactivate' ) );
 
 /**
  * Returns the core plugin instance.
  *
- * @return Ace_The_Catch
+ * @return Plugin
  */
-function ace_the_catch() {
-	return Ace_The_Catch::instance();
-}
-
-// Kick things off.
-ace_the_catch();
+Plugin::instance();
