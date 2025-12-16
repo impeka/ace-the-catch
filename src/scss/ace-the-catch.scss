@@ -1,0 +1,232 @@
+.card-table {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: minmax(120px, auto);
+    gap: 20px;
+    grid-template-areas:
+        "card-table-header card-table-header card-table-header card-table-header . . . ."
+        ". . . . . . . ."
+        ". . . . . . . ."
+        ". . . . . . . ."
+        ". . . . . . . ."
+        ". . . . . . . ."
+        ". . . . . . . .";
+}
+
+.card-table-header {
+    grid-area: card-table-header;
+}
+
+.card-table .envelope {
+    position: relative;
+    width: 100%;
+    padding-top: 140%;
+    --intro-delay: calc((var(--order, 1) - 1) * 0.05s);
+    perspective: 800px;
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    transform-origin: center;
+    animation: envelopeIntro 0.4s ease-out forwards;
+    animation-delay: var(--intro-delay);
+    transition: box-shadow 0.2s ease;
+    cursor: default;
+}
+
+.card-table .envelope:hover {
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+    scale: 1.06;
+    cursor: pointer;
+}
+
+.card-table .envelope.has-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.card-table .envelope.has-card {
+    pointer-events: none;
+}
+
+.card-table .envelope .__card {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 1500ms;
+    transform: rotateY(0deg);
+    pointer-events: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.card-table .envelope.has-card .__card {
+    animation: cardFlip 1.5s ease-in-out forwards;
+    animation-delay: calc(var(--intro-delay) + 0.35s);
+}
+
+.card-table .envelope .__front,
+.card-table .envelope .__back {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    backface-visibility: hidden;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card-table .envelope .__front {
+    transform: rotateY(180deg);
+    background-color: #fff;
+    //outline: 1px solid #BE2D23;
+    padding: 6px;
+    background-size: contain;
+    background-position: center center;
+}
+
+.card-table .envelope .__back {
+    transform: rotateY(0deg);
+    background-image: url('../images/playing-cards/card-back.svg');
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+.card-table .envelope .__back::after {
+    content: attr(data-number);
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    text-shadow: 0 4px 4px rgba(0,0,0,0.8)
+}
+
+@keyframes envelopeIntro {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes cardFlip {
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
+/* Sequential flip order based on position */
+.card-table .envelope:nth-child(1) { --order: 1; }
+.card-table .envelope:nth-child(2) { --order: 2; }
+.card-table .envelope:nth-child(3) { --order: 3; }
+.card-table .envelope:nth-child(4) { --order: 4; }
+.card-table .envelope:nth-child(5) { --order: 5; }
+.card-table .envelope:nth-child(6) { --order: 6; }
+.card-table .envelope:nth-child(7) { --order: 7; }
+.card-table .envelope:nth-child(8) { --order: 8; }
+.card-table .envelope:nth-child(9) { --order: 9; }
+.card-table .envelope:nth-child(10) { --order: 10; }
+.card-table .envelope:nth-child(11) { --order: 11; }
+.card-table .envelope:nth-child(12) { --order: 12; }
+.card-table .envelope:nth-child(13) { --order: 13; }
+.card-table .envelope:nth-child(14) { --order: 14; }
+.card-table .envelope:nth-child(15) { --order: 15; }
+.card-table .envelope:nth-child(16) { --order: 16; }
+.card-table .envelope:nth-child(17) { --order: 17; }
+.card-table .envelope:nth-child(18) { --order: 18; }
+.card-table .envelope:nth-child(19) { --order: 19; }
+.card-table .envelope:nth-child(20) { --order: 20; }
+.card-table .envelope:nth-child(21) { --order: 21; }
+.card-table .envelope:nth-child(22) { --order: 22; }
+.card-table .envelope:nth-child(23) { --order: 23; }
+.card-table .envelope:nth-child(24) { --order: 24; }
+.card-table .envelope:nth-child(25) { --order: 25; }
+.card-table .envelope:nth-child(26) { --order: 26; }
+.card-table .envelope:nth-child(27) { --order: 27; }
+.card-table .envelope:nth-child(28) { --order: 28; }
+.card-table .envelope:nth-child(29) { --order: 29; }
+.card-table .envelope:nth-child(30) { --order: 30; }
+.card-table .envelope:nth-child(31) { --order: 31; }
+.card-table .envelope:nth-child(32) { --order: 32; }
+.card-table .envelope:nth-child(33) { --order: 33; }
+.card-table .envelope:nth-child(34) { --order: 34; }
+.card-table .envelope:nth-child(35) { --order: 35; }
+.card-table .envelope:nth-child(36) { --order: 36; }
+.card-table .envelope:nth-child(37) { --order: 37; }
+.card-table .envelope:nth-child(38) { --order: 38; }
+.card-table .envelope:nth-child(39) { --order: 39; }
+.card-table .envelope:nth-child(40) { --order: 40; }
+.card-table .envelope:nth-child(41) { --order: 41; }
+.card-table .envelope:nth-child(42) { --order: 42; }
+.card-table .envelope:nth-child(43) { --order: 43; }
+.card-table .envelope:nth-child(44) { --order: 44; }
+.card-table .envelope:nth-child(45) { --order: 45; }
+.card-table .envelope:nth-child(46) { --order: 46; }
+.card-table .envelope:nth-child(47) { --order: 47; }
+.card-table .envelope:nth-child(48) { --order: 48; }
+.card-table .envelope:nth-child(49) { --order: 49; }
+.card-table .envelope:nth-child(50) { --order: 50; }
+.card-table .envelope:nth-child(51) { --order: 51; }
+.card-table .envelope:nth-child(52) { --order: 52; }
+
+/* Map card faces to backgrounds */
+.card-table .envelope[data-card="club-1"] .__front { background-image: url('../images/playing-cards/club-1.svg'); }
+.card-table .envelope[data-card="club-2"] .__front { background-image: url('../images/playing-cards/club-2.svg'); }
+.card-table .envelope[data-card="club-3"] .__front { background-image: url('../images/playing-cards/club-3.svg'); }
+.card-table .envelope[data-card="club-4"] .__front { background-image: url('../images/playing-cards/club-4.svg'); }
+.card-table .envelope[data-card="club-5"] .__front { background-image: url('../images/playing-cards/club-5.svg'); }
+.card-table .envelope[data-card="club-6"] .__front { background-image: url('../images/playing-cards/club-6.svg'); }
+.card-table .envelope[data-card="club-7"] .__front { background-image: url('../images/playing-cards/club-7.svg'); }
+.card-table .envelope[data-card="club-8"] .__front { background-image: url('../images/playing-cards/club-8.svg'); }
+.card-table .envelope[data-card="club-9"] .__front { background-image: url('../images/playing-cards/club-9.svg'); }
+.card-table .envelope[data-card="club-10"] .__front { background-image: url('../images/playing-cards/club-10.svg'); }
+.card-table .envelope[data-card="club-11-jack"] .__front { background-image: url('../images/playing-cards/club-11-jack.svg'); }
+.card-table .envelope[data-card="club-12-queen"] .__front { background-image: url('../images/playing-cards/club-12-queen.svg'); }
+.card-table .envelope[data-card="club-13-king"] .__front { background-image: url('../images/playing-cards/club-13-king.svg'); }
+.card-table .envelope[data-card="diamond-1"] .__front { background-image: url('../images/playing-cards/diamond-1.svg'); }
+.card-table .envelope[data-card="diamond-2"] .__front { background-image: url('../images/playing-cards/diamond-2.svg'); }
+.card-table .envelope[data-card="diamond-3"] .__front { background-image: url('../images/playing-cards/diamond-3.svg'); }
+.card-table .envelope[data-card="diamond-4"] .__front { background-image: url('../images/playing-cards/diamond-4.svg'); }
+.card-table .envelope[data-card="diamond-5"] .__front { background-image: url('../images/playing-cards/diamond-5.svg'); }
+.card-table .envelope[data-card="diamond-6"] .__front { background-image: url('../images/playing-cards/diamond-6.svg'); }
+.card-table .envelope[data-card="diamond-7"] .__front { background-image: url('../images/playing-cards/diamond-7.svg'); }
+.card-table .envelope[data-card="diamond-8"] .__front { background-image: url('../images/playing-cards/diamond-8.svg'); }
+.card-table .envelope[data-card="diamond-9"] .__front { background-image: url('../images/playing-cards/diamond-9.svg'); }
+.card-table .envelope[data-card="diamond-10"] .__front { background-image: url('../images/playing-cards/diamond-10.svg'); }
+.card-table .envelope[data-card="diamond-11-jack"] .__front { background-image: url('../images/playing-cards/diamond-11-jack.svg'); }
+.card-table .envelope[data-card="diamond-12-queen"] .__front { background-image: url('../images/playing-cards/diamond-12-queen.svg'); }
+.card-table .envelope[data-card="diamond-13-king"] .__front { background-image: url('../images/playing-cards/diamond-13-king.svg'); }
+.card-table .envelope[data-card="heart-1"] .__front { background-image: url('../images/playing-cards/heart-1.svg'); }
+.card-table .envelope[data-card="heart-2"] .__front { background-image: url('../images/playing-cards/heart-2.svg'); }
+.card-table .envelope[data-card="heart-3"] .__front { background-image: url('../images/playing-cards/heart-3.svg'); }
+.card-table .envelope[data-card="heart-4"] .__front { background-image: url('../images/playing-cards/heart-4.svg'); }
+.card-table .envelope[data-card="heart-5"] .__front { background-image: url('../images/playing-cards/heart-5.svg'); }
+.card-table .envelope[data-card="heart-6"] .__front { background-image: url('../images/playing-cards/heart-6.svg'); }
+.card-table .envelope[data-card="heart-7"] .__front { background-image: url('../images/playing-cards/heart-7.svg'); }
+.card-table .envelope[data-card="heart-8"] .__front { background-image: url('../images/playing-cards/heart-8.svg'); }
+.card-table .envelope[data-card="heart-9"] .__front { background-image: url('../images/playing-cards/heart-9.svg'); }
+.card-table .envelope[data-card="heart-10"] .__front { background-image: url('../images/playing-cards/heart-10.svg'); }
+.card-table .envelope[data-card="heart-11-jack"] .__front { background-image: url('../images/playing-cards/heart-11-jack.svg'); }
+.card-table .envelope[data-card="heart-12-queen"] .__front { background-image: url('../images/playing-cards/heart-12-queen.svg'); }
+.card-table .envelope[data-card="heart-13-king"] .__front { background-image: url('../images/playing-cards/heart-13-king.svg'); }
+.card-table .envelope[data-card="spade-1"] .__front { background-image: url('../images/playing-cards/spade-1.svg'); }
+.card-table .envelope[data-card="spade-2"] .__front { background-image: url('../images/playing-cards/spade-2.svg'); }
+.card-table .envelope[data-card="spade-3"] .__front { background-image: url('../images/playing-cards/spade-3.svg'); }
+.card-table .envelope[data-card="spade-4"] .__front { background-image: url('../images/playing-cards/spade-4.svg'); }
+.card-table .envelope[data-card="spade-5"] .__front { background-image: url('../images/playing-cards/spade-5.svg'); }
+.card-table .envelope[data-card="spade-6"] .__front { background-image: url('../images/playing-cards/spade-6.svg'); }
+.card-table .envelope[data-card="spade-7"] .__front { background-image: url('../images/playing-cards/spade-7.svg'); }
+.card-table .envelope[data-card="spade-8"] .__front { background-image: url('../images/playing-cards/spade-8.svg'); }
+.card-table .envelope[data-card="spade-9"] .__front { background-image: url('../images/playing-cards/spade-9.svg'); }
+.card-table .envelope[data-card="spade-10"] .__front { background-image: url('../images/playing-cards/spade-10.svg'); }
+.card-table .envelope[data-card="spade-11-jack"] .__front { background-image: url('../images/playing-cards/spade-11-jack.svg'); }
+.card-table .envelope[data-card="spade-12-queen"] .__front { background-image: url('../images/playing-cards/spade-12-queen.svg'); }
+.card-table .envelope[data-card="spade-13-king"] .__front { background-image: url('../images/playing-cards/spade-13-king.svg'); }

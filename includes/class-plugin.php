@@ -45,6 +45,13 @@ final class Plugin {
 	private GeoLocatorFactory $geo_locator_factory;
 
 	/**
+	 * Envelope shortcode handler.
+	 *
+	 * @var EnvelopeDealer
+	 */
+	private EnvelopeDealer $envelope_dealer;
+
+	/**
 	 * Private constructor to enforce singleton.
 	 */
 	private function __construct() {
@@ -52,6 +59,7 @@ final class Plugin {
 
 		$this->payment_processor_factory = new PaymentProcessorFactory();
 		$this->geo_locator_factory       = new GeoLocatorFactory();
+		$this->envelope_dealer           = new EnvelopeDealer();
 
 		$this->init_hooks();
 	}
@@ -78,6 +86,7 @@ final class Plugin {
 		\add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		\add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
+		\add_action( 'init', array( $this, 'register_shortcodes' ) );
 	}
 
 	/**
@@ -126,6 +135,13 @@ final class Plugin {
 		$version = $this->version;
 
 		\wp_enqueue_style(
+			'ace-the-catch',
+			LOTTO_URL . 'assets/css/ace-the-catch.css',
+			array(),
+			$version
+		);
+
+		\wp_enqueue_style(
 			'ace-the-catch-public',
 			LOTTO_URL . 'assets/css/public.css',
 			array(),
@@ -139,6 +155,15 @@ final class Plugin {
 			$version,
 			true
 		);
+	}
+
+	/**
+	 * Register shortcodes.
+	 *
+	 * @return void
+	 */
+	public function register_shortcodes(): void {
+		$this->envelope_dealer->register();
 	}
 
 	/**

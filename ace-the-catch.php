@@ -29,6 +29,7 @@ require_once LOTTO_PATH . 'includes/interface-payment-processor.php';
 require_once LOTTO_PATH . 'includes/class-payment-processor-factory.php';
 require_once LOTTO_PATH . 'includes/interface-geo-locator.php';
 require_once LOTTO_PATH . 'includes/class-geo-locator-factory.php';
+require_once LOTTO_PATH . 'includes/class-envelope-dealer.php';
 require_once LOTTO_PATH . 'includes/class-plugin.php';
 
 \register_activation_hook( LOTTO_FILE, array( __NAMESPACE__ . '\\Activator', 'activate' ) );
