@@ -132,7 +132,7 @@ class EnvelopeDealer {
 
 		for ( $index = 1; $index <= 52; $index++ ) {
 			$card      = $card_map[ $index ] ?? '';
-			$card_attr = $card ? ' data-card="' . \esc_attr( $card ) . '"' : '';
+			$card_attr = $card ? ' data-card="' . \esc_attr( $card ) . '"' : sprintf( ' tabindex="0" role="button" aria-label="%s"', sprintf( __( 'Envelope #%s', 'ace-the-catch' ), $index ) );
 			$classes   = 'envelope' . ( $card ? ' has-card' : '' );
 
 			$items[] = '<div class="' . $classes . '" data-envelope="' . $index . '" style="--order:' . $index . '"' . $card_attr . '>

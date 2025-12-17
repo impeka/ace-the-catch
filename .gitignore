@@ -1,1 +1,3 @@
 ace-the-catch.code-workspace
+node_modules/
+vendor/

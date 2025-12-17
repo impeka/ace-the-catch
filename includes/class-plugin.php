@@ -52,6 +52,20 @@ final class Plugin {
 	private EnvelopeDealer $envelope_dealer;
 
 	/**
+	 * Catch the Ace custom post type.
+	 *
+	 * @var CatchTheAceCpt
+	 */
+	private CatchTheAceCpt $catch_the_ace_cpt;
+
+	/**
+	 * Catch the Ace ACF registration.
+	 *
+	 * @var CatchTheAceAcf
+	 */
+	private CatchTheAceAcf $catch_the_ace_acf;
+
+	/**
 	 * Private constructor to enforce singleton.
 	 */
 	private function __construct() {
@@ -60,6 +74,8 @@ final class Plugin {
 		$this->payment_processor_factory = new PaymentProcessorFactory();
 		$this->geo_locator_factory       = new GeoLocatorFactory();
 		$this->envelope_dealer           = new EnvelopeDealer();
+		$this->catch_the_ace_cpt         = new CatchTheAceCpt();
+		$this->catch_the_ace_acf         = new CatchTheAceAcf();
 
 		$this->init_hooks();
 	}
@@ -150,7 +166,7 @@ final class Plugin {
 
 		\wp_enqueue_script(
 			'ace-the-catch-public',
-			LOTTO_URL . 'assets/js/public.js',
+			LOTTO_URL . 'assets/js/public.bundle.js',
 			array( 'jquery' ),
 			$version,
 			true
