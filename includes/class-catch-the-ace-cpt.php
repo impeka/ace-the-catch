@@ -18,6 +18,7 @@ class CatchTheAceCpt {
 	 */
 	public function __construct() {
 		\add_action( 'init', array( $this, 'register' ) );
+		\add_action( 'admin_menu', array( $this, 'add_icon' ) );
 	}
 
 	/**
@@ -41,27 +42,63 @@ class CatchTheAceCpt {
 			'not_found'             => \__( 'No sessions found.', 'ace-the-catch' ),
 			'not_found_in_trash'    => \__( 'No sessions found in Trash.', 'ace-the-catch' ),
 		);
-
-		$menu_icon = 'data:image/svg+xml;base64,' . \base64_encode(
-			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='M12 2c-2.9 4-8 7-8 11a4 4 0 004 4c1.6 0 3-.8 3.6-2h.8c.6 1.2 2 2 3.6 2a4 4 0 004-4c0-4-5.1-7-8-11zm-1 18v2h2v-2z'/></svg>"
-		);
-
 		$args = array(
 			'labels'             => $labels,
-			'public'             => false,
-			'publicly_queryable' => false,
+			'public'             => true,
+			'publicly_queryable' => true,
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 			'show_in_rest'       => true,
-			'has_archive'        => false,
-			'exclude_from_search'=> true,
-			'rewrite'            => false,
+			'has_archive'        => 'catch-the-ace',
+			'exclude_from_search'=> false,
+			'rewrite'            => array(
+				'slug'       => 'catch-the-ace',
+				'with_front' => false,
+			),
 			'supports'           => array( 'title' ),
 			'capability_type'    => 'post',
-			// Simple spade icon as a data URI (keeps menu light without bundling card art).
-			'menu_icon'          => $menu_icon,
+			'menu_icon'          => 'none', //we fill this later
 		);
 
 		\register_post_type( 'catch-the-ace', $args );
+	}
+
+	public function add_icon() : void {
+		$icon_path = plugin_dir_path( LOTTO_FILE ) . '/assets/images/spade.svg';
+		$svg = file_get_contents( $icon_path );
+		$data_uri = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode($svg);
+
+		echo '<style>
+			/* Your menu slug: toplevel_page_{menu_slug} */
+			#adminmenu .menu-icon-catch-the-ace .wp-menu-image {
+			color: #a7aaad; /* default WP icon color */
+			}
+
+			#adminmenu .menu-icon-catch-the-ace .wp-menu-image:before {
+			content: "";
+			display: block;
+			width: 20px;
+			height: 20px;
+			margin: 0 auto; 
+			background-color: currentColor;
+
+			-webkit-mask: url("'.$data_uri.'") no-repeat 50% 50%;
+			mask: url("'.$data_uri.'") no-repeat 50% 50%;
+			-webkit-mask-size: 20px 20px;
+			mask-size: 20px 20px;
+			}
+
+			/* Hover/focus */
+			#adminmenu li.menu-icon-catch-the-ace:hover .wp-menu-image,
+			#adminmenu li.menu-icon-catch-the-ace > a:focus .wp-menu-image {
+			color: #fff;
+			}
+
+			/* Current / active */
+			#adminmenu li.current.menu-icon-catch-the-ace .wp-menu-image,
+			#adminmenu li.wp-has-current-submenu.menu-icon-catch-the-ace .wp-menu-image {
+			color: #fff;
+			}
+		</style>';
 	}
 }

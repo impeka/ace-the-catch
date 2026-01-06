@@ -1,3 +1,10 @@
+.catch-the-ace__wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@import "../../node_modules/simplycountdown.js/src/themes/default.css";
+
 .card-table {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -15,6 +22,295 @@
 
 .card-table-header {
     grid-area: card-table-header;
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.card-table-header__week {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 38px;
+    background: #0b1424;
+    color: #f6e8d6;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.card-table-header__week .__inner {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-size: 13px;
+}
+
+.card-table-header__content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 12px;
+    color: #0b1424;
+}
+
+.card-table-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card-table-header__cta {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.card-table-header__countdown,
+.ace-countdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #0b1424;
+}
+
+.card-table-header__countdown {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card-table-header__countdown-label {
+    display: block;
+    line-height: 1.2;
+}
+
+.card-table-header__countdown-timer {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ace-winners-countdown {
+    margin-bottom: 16px;
+}
+
+.card-table-header .simply-countdown {
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.card-table-header .simply-countdown > .simply-section {
+    width: 46px;
+    height: 46px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.card-table-header .simply-countdown > .simply-section > div {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    align-items: center;
+}
+
+.card-table-header .simply-countdown .simply-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.card-table-header .simply-countdown .simply-word {
+    font-size: 0.5rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+@media (min-width: 640px) {
+    .card-table-header .simply-countdown > .simply-section {
+        width: 54px;
+        height: 54px;
+        padding: 0.9rem;
+    }
+
+    .card-table-header .simply-countdown .simply-amount {
+        font-size: 1.1rem;
+    }
+
+    .card-table-header .simply-countdown .simply-word {
+        font-size: 0.55rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .card-table-header .simply-countdown > .simply-section {
+        width: 58px;
+        height: 58px;
+        padding: 1rem;
+    }
+
+    .card-table-header .simply-countdown .simply-amount {
+        font-size: 1.2rem;
+    }
+
+    .card-table-header .simply-countdown .simply-word {
+        font-size: 0.6rem;
+    }
+}
+
+.card-table-header__btn {
+    background: transparent;
+    color: #0b1424;
+    padding: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    width: 120px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.card-table-header__btn:hover {
+    transform: translateY(-1px);
+}
+
+.card-table-header__btn:active {
+    transform: translateY(1px);
+}
+
+.card-table-header__btn--ghost {
+    background: #0b1424;
+    color: #f6e8d6;
+    border-radius: 8px;
+    padding-inline: 10px;
+}
+
+.card-table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 4px 0 0 0;
+    margin-bottom: 14px;
+}
+
+.ace-winners__title {
+    margin: 0 auto 20px;
+}
+
+.ace-winners-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    display: grid;
+    gap: 14px;
+}
+
+.ace-winners-list__item {
+    padding: 12px;
+    border: 1px solid #d8dbe2;
+    border-radius: 10px;
+    background: #f8fafc;
+    align-items: center;
+}
+
+.ace-winners__body {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+
+    p {
+        margin: 0 auto 1em;
+
+        &:last-child {
+            margin: 0 auto;
+        }
+    }
+}
+
+.ace-winners-list__card {
+    width: 100%;
+    max-width: 120px;
+    aspect-ratio: 2.25 / 3.5;
+    background: #fff;
+    padding: 0 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.ace-winners-list__card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.ace-winners-list__card--placeholder {
+    font-weight: 600;
+    color: #475569;
+}
+
+.ace-winners-list__details {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.ace-winners-list__date {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.ace-winners-list__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: #1f2937;
+}
+
+.ace-winners-list__note {
+    margin-top: 6px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.ace-winners-list__item--ace .ace-winners-list__card {
+    box-shadow: 0 0 0 0 rgba(#EFBF04, 1);
+    animation: pulse 2s infinite;
+}
+
+.ace-winners-list__item--ace .ace-winners-list__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    box-shadow: 0 0 0 0 rgba(190, 45, 35, 0.28);
+    pointer-events: none;
 }
 
 .card-table .envelope {
@@ -22,6 +318,7 @@
     width: 100%;
     padding-top: 140%;
     --intro-delay: calc((var(--order, 1) - 1) * 0.05s);
+    --flip-delay: calc((var(--flip-order, var(--order, 1)) - 1) * 0.05s);
     perspective: 800px;
     opacity: 0;
     transform: translateY(8px) scale(0.96);
@@ -36,6 +333,18 @@
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
     scale: 1.06;
     cursor: pointer;
+}
+
+.card-table .envelope.envelope--disabled {
+    pointer-events: auto;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.card-table .envelope.envelope--disabled:hover {
+    box-shadow: none;
+    scale: 1;
 }
 
 .card-table .envelope.has-card:hover {
@@ -57,9 +366,14 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-.card-table .envelope.has-card .__card {
+.card-table .envelope[data-card="spade-1"] .__card .__front {
+    box-shadow: 0 0 0 0 rgba(#EFBF04, 1);
+    animation: pulse 2s infinite;
+}
+
+.card-table .envelope.has-card .__card  {
     animation: cardFlip 1.5s ease-in-out forwards;
-    animation-delay: calc(var(--intro-delay) + 0.35s);
+    animation-delay: calc(var(--flip-delay) + 0.35s);
 }
 
 .card-table .envelope .__front,
@@ -84,6 +398,7 @@
     padding: 6px;
     background-size: contain;
     background-position: center center;
+    position: relative;
 }
 
 .card-table .envelope .__back {
@@ -104,6 +419,26 @@
     letter-spacing: 0.04em;
     color: #fff;
     text-shadow: 0 4px 4px rgba(0, 0, 0, 0.8);
+}
+
+.card-table .envelope[data-card="spade-1"].has-card .__front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    box-shadow: 0 0 0 0 rgba(190, 45, 35, 0.28);
+    pointer-events: none;
+}
+
+.card-table-wrap--closed .envelope {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.card-table-wrap--closed .envelope.has-card .__card {
+    animation: none;
+    transform: rotateY(180deg);
 }
 
 .swal2-popup .etc-modal {
@@ -154,6 +489,108 @@
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+.card-table-wrap {
+    display: grid;
+    gap: 16px;
+    visibility: hidden;
+}
+
+.card-table-wrap.is-ready {
+    visibility: visible;
+}
+
+.ace-cart {
+    background: #f5f7fb;
+    color: #0f172a;
+    border: 1px solid #d8dbe2;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.ace-cart__header {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.ace-cart__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ace-cart__th--icon {
+    width: 34px;
+}
+
+.ace-cart__table th,
+.ace-cart__table td {
+    padding: 8px 6px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ace-cart__table th {
+    font-weight: 600;
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.ace-cart__table tr:last-child td {
+    border-bottom: none;
+}
+
+.ace-cart__table th:nth-child(2),
+.ace-cart__table td:nth-child(2) {
+    text-align: right;
+}
+
+.ace-cart__table th:nth-child(3),
+.ace-cart__table td:nth-child(3) {
+    text-align: right;
+}
+
+.ace-cart__remove {
+    text-align: center;
+}
+
+.ace-cart__remove-btn {
+    background: transparent;
+    border: none;
+    color: #a80000;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.ace-cart__qty {
+    width: 90px;
+    padding: 6px 10px;
+    border: 1px solid #c3cad5;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.ace-cart__amount {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.ace-cart__total-label {
+    text-align: right;
+    font-weight: 700;
+    padding-right: 10px;
+}
+
+.ace-cart__total-value {
+    text-align: right;
+    font-weight: 800;
+}
+
 @keyframes envelopeIntro {
     0% {
         opacity: 0;
@@ -172,58 +609,58 @@
 }
 
 /* Sequential flip order based on position */
-.card-table .envelope:nth-child(1) { --order: 1; }
-.card-table .envelope:nth-child(2) { --order: 2; }
-.card-table .envelope:nth-child(3) { --order: 3; }
-.card-table .envelope:nth-child(4) { --order: 4; }
-.card-table .envelope:nth-child(5) { --order: 5; }
-.card-table .envelope:nth-child(6) { --order: 6; }
-.card-table .envelope:nth-child(7) { --order: 7; }
-.card-table .envelope:nth-child(8) { --order: 8; }
-.card-table .envelope:nth-child(9) { --order: 9; }
-.card-table .envelope:nth-child(10) { --order: 10; }
-.card-table .envelope:nth-child(11) { --order: 11; }
-.card-table .envelope:nth-child(12) { --order: 12; }
-.card-table .envelope:nth-child(13) { --order: 13; }
-.card-table .envelope:nth-child(14) { --order: 14; }
-.card-table .envelope:nth-child(15) { --order: 15; }
-.card-table .envelope:nth-child(16) { --order: 16; }
-.card-table .envelope:nth-child(17) { --order: 17; }
-.card-table .envelope:nth-child(18) { --order: 18; }
-.card-table .envelope:nth-child(19) { --order: 19; }
-.card-table .envelope:nth-child(20) { --order: 20; }
-.card-table .envelope:nth-child(21) { --order: 21; }
-.card-table .envelope:nth-child(22) { --order: 22; }
-.card-table .envelope:nth-child(23) { --order: 23; }
-.card-table .envelope:nth-child(24) { --order: 24; }
-.card-table .envelope:nth-child(25) { --order: 25; }
-.card-table .envelope:nth-child(26) { --order: 26; }
-.card-table .envelope:nth-child(27) { --order: 27; }
-.card-table .envelope:nth-child(28) { --order: 28; }
-.card-table .envelope:nth-child(29) { --order: 29; }
-.card-table .envelope:nth-child(30) { --order: 30; }
-.card-table .envelope:nth-child(31) { --order: 31; }
-.card-table .envelope:nth-child(32) { --order: 32; }
-.card-table .envelope:nth-child(33) { --order: 33; }
-.card-table .envelope:nth-child(34) { --order: 34; }
-.card-table .envelope:nth-child(35) { --order: 35; }
-.card-table .envelope:nth-child(36) { --order: 36; }
-.card-table .envelope:nth-child(37) { --order: 37; }
-.card-table .envelope:nth-child(38) { --order: 38; }
-.card-table .envelope:nth-child(39) { --order: 39; }
-.card-table .envelope:nth-child(40) { --order: 40; }
-.card-table .envelope:nth-child(41) { --order: 41; }
-.card-table .envelope:nth-child(42) { --order: 42; }
-.card-table .envelope:nth-child(43) { --order: 43; }
-.card-table .envelope:nth-child(44) { --order: 44; }
-.card-table .envelope:nth-child(45) { --order: 45; }
-.card-table .envelope:nth-child(46) { --order: 46; }
-.card-table .envelope:nth-child(47) { --order: 47; }
-.card-table .envelope:nth-child(48) { --order: 48; }
-.card-table .envelope:nth-child(49) { --order: 49; }
-.card-table .envelope:nth-child(50) { --order: 50; }
-.card-table .envelope:nth-child(51) { --order: 51; }
-.card-table .envelope:nth-child(52) { --order: 52; }
+.card-table .envelope.has-card:nth-child(1) { --order: 1; }
+.card-table .envelope.has-card:nth-child(2) { --order: 2; }
+.card-table .envelope.has-card:nth-child(3) { --order: 3; }
+.card-table .envelope.has-card:nth-child(4) { --order: 4; }
+.card-table .envelope.has-card:nth-child(5) { --order: 5; }
+.card-table .envelope.has-card:nth-child(6) { --order: 6; }
+.card-table .envelope.has-card:nth-child(7) { --order: 7; }
+.card-table .envelope.has-card:nth-child(8) { --order: 8; }
+.card-table .envelope.has-card:nth-child(9) { --order: 9; }
+.card-table .envelope.has-card:nth-child(10) { --order: 10; }
+.card-table .envelope.has-card:nth-child(11) { --order: 11; }
+.card-table .envelope.has-card:nth-child(12) { --order: 12; }
+.card-table .envelope.has-card:nth-child(13) { --order: 13; }
+.card-table .envelope.has-card:nth-child(14) { --order: 14; }
+.card-table .envelope.has-card:nth-child(15) { --order: 15; }
+.card-table .envelope.has-card:nth-child(16) { --order: 16; }
+.card-table .envelope.has-card:nth-child(17) { --order: 17; }
+.card-table .envelope.has-card:nth-child(18) { --order: 18; }
+.card-table .envelope.has-card:nth-child(19) { --order: 19; }
+.card-table .envelope.has-card:nth-child(20) { --order: 20; }
+.card-table .envelope.has-card:nth-child(21) { --order: 21; }
+.card-table .envelope.has-card:nth-child(22) { --order: 22; }
+.card-table .envelope.has-card:nth-child(23) { --order: 23; }
+.card-table .envelope.has-card:nth-child(24) { --order: 24; }
+.card-table .envelope.has-card:nth-child(25) { --order: 25; }
+.card-table .envelope.has-card:nth-child(26) { --order: 26; }
+.card-table .envelope.has-card:nth-child(27) { --order: 27; }
+.card-table .envelope.has-card:nth-child(28) { --order: 28; }
+.card-table .envelope.has-card:nth-child(29) { --order: 29; }
+.card-table .envelope.has-card:nth-child(30) { --order: 30; }
+.card-table .envelope.has-card:nth-child(31) { --order: 31; }
+.card-table .envelope.has-card:nth-child(32) { --order: 32; }
+.card-table .envelope.has-card:nth-child(33) { --order: 33; }
+.card-table .envelope.has-card:nth-child(34) { --order: 34; }
+.card-table .envelope.has-card:nth-child(35) { --order: 35; }
+.card-table .envelope.has-card:nth-child(36) { --order: 36; }
+.card-table .envelope.has-card:nth-child(37) { --order: 37; }
+.card-table .envelope.has-card:nth-child(38) { --order: 38; }
+.card-table .envelope.has-card:nth-child(39) { --order: 39; }
+.card-table .envelope.has-card:nth-child(40) { --order: 40; }
+.card-table .envelope.has-card:nth-child(41) { --order: 41; }
+.card-table .envelope.has-card:nth-child(42) { --order: 42; }
+.card-table .envelope.has-card:nth-child(43) { --order: 43; }
+.card-table .envelope.has-card:nth-child(44) { --order: 44; }
+.card-table .envelope.has-card:nth-child(45) { --order: 45; }
+.card-table .envelope.has-card:nth-child(46) { --order: 46; }
+.card-table .envelope.has-card:nth-child(47) { --order: 47; }
+.card-table .envelope.has-card:nth-child(48) { --order: 48; }
+.card-table .envelope.has-card:nth-child(49) { --order: 49; }
+.card-table .envelope.has-card:nth-child(50) { --order: 50; }
+.card-table .envelope.has-card:nth-child(51) { --order: 51; }
+.card-table .envelope.has-card:nth-child(52) { --order: 52; }
 
 /* Map card faces to backgrounds */
 .card-table .envelope[data-card="club-1"] .__front { background-image: url('../images/playing-cards/club-1.svg'); }
@@ -278,3 +715,17 @@
 .card-table .envelope[data-card="spade-11-jack"] .__front { background-image: url('../images/playing-cards/spade-11-jack.svg'); }
 .card-table .envelope[data-card="spade-12-queen"] .__front { background-image: url('../images/playing-cards/spade-12-queen.svg'); }
 .card-table .envelope[data-card="spade-13-king"] .__front { background-image: url('../images/playing-cards/spade-13-king.svg'); }
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(#EFBF04, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(#EFBF04, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(#EFBF04, 0);
+    }
+}

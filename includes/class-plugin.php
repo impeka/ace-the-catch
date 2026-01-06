@@ -66,6 +66,20 @@ final class Plugin {
 	private CatchTheAceAcf $catch_the_ace_acf;
 
 	/**
+	 * Catch the Ace settings.
+	 *
+	 * @var CatchTheAceSettings
+	 */
+	private CatchTheAceSettings $catch_the_ace_settings;
+
+	/**
+	 * Template manager for theme overrides.
+	 *
+	 * @var TemplateManager
+	 */
+	private TemplateManager $template_manager;
+
+	/**
 	 * Private constructor to enforce singleton.
 	 */
 	private function __construct() {
@@ -76,6 +90,8 @@ final class Plugin {
 		$this->envelope_dealer           = new EnvelopeDealer();
 		$this->catch_the_ace_cpt         = new CatchTheAceCpt();
 		$this->catch_the_ace_acf         = new CatchTheAceAcf();
+		$this->catch_the_ace_settings    = new CatchTheAceSettings();
+		$this->template_manager          = new TemplateManager();
 
 		$this->init_hooks();
 	}
@@ -189,6 +205,15 @@ final class Plugin {
 	 */
 	public function get_payment_processor_factory(): PaymentProcessorFactory {
 		return $this->payment_processor_factory;
+	}
+
+	/**
+	 * Get the envelope dealer.
+	 *
+	 * @return EnvelopeDealer
+	 */
+	public function get_envelope_dealer(): EnvelopeDealer {
+		return $this->envelope_dealer;
 	}
 
 	/**

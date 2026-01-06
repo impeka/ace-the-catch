@@ -32,6 +32,8 @@ require_once LOTTO_PATH . 'includes/class-geo-locator-factory.php';
 require_once LOTTO_PATH . 'includes/class-envelope-dealer.php';
 require_once LOTTO_PATH . 'includes/class-catch-the-ace-cpt.php';
 require_once LOTTO_PATH . 'includes/class-catch-the-ace-acf.php';
+require_once LOTTO_PATH . 'includes/class-catch-the-ace-settings.php';
+require_once LOTTO_PATH . 'includes/class-template-manager.php';
 require_once LOTTO_PATH . 'includes/class-plugin.php';
 
 \register_activation_hook( LOTTO_FILE, array( __NAMESPACE__ . '\\Activator', 'activate' ) );

@@ -204,6 +204,31 @@ class CatchTheAceAcf {
 							),
 						),
 					),
+					array(
+						'key'   => 'field_weekly_draw',
+						'label' => \__( 'Weekly Draw Occurs On', 'ace-the-catch' ),
+						'name'  => 'weekly_draw_on',
+						'type'  => 'group',
+						'layout'=> 'block',
+						'sub_fields' => array(
+							array(
+								'key'     => 'field_weekly_draw_day',
+								'label'   => \__( 'Day of Week', 'ace-the-catch' ),
+								'name'    => 'day',
+								'type'    => 'select',
+								'choices' => $days,
+								'ui'      => 1,
+							),
+							array(
+								'key'           => 'field_weekly_draw_time',
+								'label'         => \__( 'Time', 'ace-the-catch' ),
+								'name'          => 'time',
+								'type'          => 'time_picker',
+								'display_format'=> 'g:i a',
+								'return_format' => 'H:i',
+							),
+						),
+					),
 				),
 				'location' => array(
 					array(
@@ -273,6 +298,16 @@ class CatchTheAceAcf {
 								'type'  => 'number',
 								'prepend' => '$',
 								'step'  => 'any',
+							),
+							array(
+								'key'           => 'field_winning_note',
+								'label'         => \__( 'Winning Note', 'ace-the-catch' ),
+								'name'          => 'winning_note',
+								'type'          => 'wysiwyg',
+								'tabs'          => 'visual',
+								'toolbar'       => 'basic',
+								'media_upload'  => 0,
+								'delay'         => 1,
 							),
 						),
 					),

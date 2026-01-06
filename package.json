@@ -8,6 +8,7 @@
     "@sweetalert2/theme-material-ui": "^5.0.27",
     "@tsparticles/confetti": "^3.9.1",
     "@tsparticles/engine": "^3.9.1",
+    "simplycountdown.js": "^3.0.1",
     "sweetalert2": "^11.26.10"
   },
   "devDependencies": {
