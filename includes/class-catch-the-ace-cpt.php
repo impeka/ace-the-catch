@@ -18,7 +18,8 @@ class CatchTheAceCpt {
 	 */
 	public function __construct() {
 		\add_action( 'init', array( $this, 'register' ) );
-		\add_action( 'admin_menu', array( $this, 'add_icon' ) );
+		// Print the admin icon CSS late in the head to avoid sending output before redirects/headers.
+		\add_action( 'admin_head', array( $this, 'add_icon' ) );
 	}
 
 	/**

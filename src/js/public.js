@@ -252,11 +252,24 @@ const ace_the_catch = {
 	},
 
 	init_envelopes: function () {
+		const geoBlockedWrap = document.querySelector( '.card-table-wrap[data-geo-block="1"]' );
+		this.geoBlocked = !! geoBlockedWrap;
+		this.geoMessage = geoBlockedWrap?.dataset?.geoMessage || 'Ticket sales are not available in your region.';
+
+		if ( this.geoBlocked ) {
+			Swal.fire( {
+				title: 'Not available in your region',
+				html: this.geoMessage,
+				icon: 'info',
+				confirmButtonText: 'OK',
+			} );
+		}
+
 		const envelopes = document.querySelectorAll( '.envelope:not([data-card])' );
 		if ( envelopes ) {
 			envelopes.forEach( ( envelope ) => {
 				const state = this.get_sales_state( envelope );
-				if ( ! state.open ) {
+				if ( this.geoBlocked || ! state.open ) {
 					envelope.classList.add( 'envelope--disabled' );
 				}
 
@@ -275,6 +288,16 @@ const ace_the_catch = {
 	},
 
 	handle_envelope_click: function ( envelopeEl ) {
+		if ( this.geoBlocked ) {
+			Swal.fire( {
+				title: 'Not available in your region',
+				html: this.geoMessage,
+				icon: 'info',
+				confirmButtonText: 'OK',
+			} );
+			return;
+		}
+
 		const state = this.get_sales_state( envelopeEl );
 
 		if ( ! state.open ) {

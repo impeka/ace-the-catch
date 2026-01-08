@@ -128,9 +128,19 @@ class EnvelopeDealer {
 			return '';
 		}
 
-		$card_map     = $this->get_card_map( $post_id );
-		$ticket_price = \floatval( \get_option( CatchTheAceSettings::OPTION_TICKET_PRICE, 0 ) );
-		$sales_status = $this->get_sales_status( $post_id );
+		$card_map      = $this->get_card_map( $post_id );
+		$ticket_price  = \floatval( \get_option( CatchTheAceSettings::OPTION_TICKET_PRICE, 0 ) );
+		$sales_status  = $this->get_sales_status( $post_id );
+		$geo_status    = $this->evaluate_geo_access();
+		$geo_blocked   = $geo_status['blocked'];
+		$geo_message   = $geo_status['message'];
+
+		if ( $geo_blocked ) {
+			$sales_status['open']        = false;
+			$sales_status['close_epoch'] = 0;
+			$sales_status['open_epoch']  = 0;
+			$sales_status['message']     = $geo_message;
+		}
 
 		$draws_count = $this->get_draws_count( $post_id );
 		$permalink   = \get_permalink( $post_id );
@@ -205,14 +215,14 @@ class EnvelopeDealer {
 			$wrap_classes .= ' card-table-wrap--closed';
 		}
 
-		return '<div class="' . $wrap_classes . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
+		return '<div class="' . $wrap_classes . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_message ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
 	}
 
 	/**
 	 * Generate the envelope markup.
 	 *
 	 * @param array<int,string> $card_map Map of envelope number to card slug.
-	 * @param bool              $sales_open Whether ticket sales are open.
+	 * @param bool              $sales_open Whether selection is allowed.
 	 * @return string
 	 */
 	private function build_envelopes( array $card_map, bool $sales_open ): string {
@@ -421,5 +431,50 @@ class EnvelopeDealer {
 		}
 
 		return $map;
+	}
+
+	/**
+	 * Evaluate geo access based on selected locator and configured message.
+	 *
+	 * @return array{blocked:bool,message:string}
+	 */
+	private function evaluate_geo_access(): array {
+		$blocked          = false;
+		$default_message  = \__( 'Ticket sales are not available in your region.', 'ace-the-catch' );
+		$admin_message    = \get_option( CatchTheAceSettings::OPTION_OUTSIDE_MESSAGE, '' );
+		$message          = $admin_message ? \wp_kses_post( $admin_message ) : $default_message;
+		$locator_key      = \get_option( CatchTheAceSettings::OPTION_GEO_LOCATOR, '' );
+		$locator_configs  = \get_option( CatchTheAceSettings::OPTION_GEO_LOCATOR_CFG, array() );
+
+		if ( empty( $locator_key ) ) {
+			return array( 'blocked' => false, 'message' => $message );
+		}
+
+		$factory = Plugin::instance()->get_geo_locator_factory();
+		$locator = $factory->create( $locator_key );
+
+		if ( ! $locator ) {
+			return array( 'blocked' => false, 'message' => $message );
+		}
+
+		$config = ( \is_array( $locator_configs ) && isset( $locator_configs[ $locator_key ] ) && \is_array( $locator_configs[ $locator_key ] ) )
+			? $locator_configs[ $locator_key ]
+			: array();
+
+		$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+		$result = $locator->locate(
+			array(
+				'ip'     => $ip,
+				'config' => $config,
+			)
+		);
+
+		$in_ontario = isset( $result['in_ontario'] ) ? (bool) $result['in_ontario'] : false;
+		$blocked    = ! $in_ontario;
+
+		return array(
+			'blocked' => $blocked,
+			'message' => $message,
+		);
 	}
 }

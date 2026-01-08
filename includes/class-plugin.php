@@ -87,6 +87,7 @@ final class Plugin {
 
 		$this->payment_processor_factory = new PaymentProcessorFactory();
 		$this->geo_locator_factory       = new GeoLocatorFactory();
+		$this->register_builtin_locators();
 		$this->envelope_dealer           = new EnvelopeDealer();
 		$this->catch_the_ace_cpt         = new CatchTheAceCpt();
 		$this->catch_the_ace_acf         = new CatchTheAceAcf();
@@ -223,5 +224,33 @@ final class Plugin {
 	 */
 	public function get_geo_locator_factory(): GeoLocatorFactory {
 		return $this->geo_locator_factory;
+	}
+
+	/**
+	 * Register built-in geo locator providers.
+	 *
+	 * @return void
+	 */
+	private function register_builtin_locators(): void {
+		$this->geo_locator_factory->register(
+			'dummy_ontario',
+			static function () {
+				return new DummyGeoLocatorOntario();
+			}
+		);
+
+		$this->geo_locator_factory->register(
+			'dummy_outside',
+			static function () {
+				return new DummyGeoLocatorOutsideOntario();
+			}
+		);
+
+		$this->geo_locator_factory->register(
+			'maxmind',
+			static function () {
+				return new MaxMindGeoLocator();
+			}
+		);
 	}
 }

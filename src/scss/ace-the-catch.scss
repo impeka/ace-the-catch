@@ -436,11 +436,6 @@
     transform: translateY(0) scale(1);
 }
 
-.card-table-wrap--closed .envelope.has-card .__card {
-    animation: none;
-    transform: rotateY(180deg);
-}
-
 .swal2-popup .etc-modal {
     margin-top: 12px;
     font-size: 15px;
