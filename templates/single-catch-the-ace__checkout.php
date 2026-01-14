@@ -39,6 +39,7 @@ $customer_location = $view['customer_location'] ?? '';
 $benefactors      = $view['benefactors'] ?? array();
 $selected_benefactor = (int) ( $view['selected_benefactor'] ?? 0 );
 $terms_url        = $view['terms_url'] ?? '';
+$rules_url        = $view['rules_url'] ?? '';
 
 get_header();
 
@@ -173,16 +174,29 @@ get_header();
 							<label>
 								<input type="checkbox" name="ace_agree_terms" value="1" required />
 								<?php
+								$terms_open  = '';
+								$terms_close = '';
+								$rules_open  = '';
+								$rules_close = '';
+
 								if ( ! empty( $terms_url ) ) {
-									printf(
-										/* translators: 1: opening link tag, 2: closing link tag */
-										esc_html__( 'I agree to the %1$sterms and conditions%2$s.', 'ace-the-catch' ),
-										'<a href="' . esc_url( (string) $terms_url ) . '" target="_blank" rel="noopener noreferrer">',
-										'</a>'
-									);
-								} else {
-									esc_html_e( 'I agree to the terms and conditions.', 'ace-the-catch' );
+									$terms_open  = '<a href="' . esc_url( (string) $terms_url ) . '" target="_blank" rel="noopener noreferrer">';
+									$terms_close = '</a>';
 								}
+
+								if ( ! empty( $rules_url ) ) {
+									$rules_open  = '<a href="' . esc_url( (string) $rules_url ) . '" target="_blank" rel="noopener noreferrer">';
+									$rules_close = '</a>';
+								}
+
+								printf(
+									/* translators: 1: opening link tag for terms, 2: closing link tag for terms, 3: opening link tag for rules, 4: closing link tag for rules */
+									esc_html__( 'I agree to the %1$sterms and conditions%2$s and %3$srules of play%4$s.', 'ace-the-catch' ),
+									$terms_open,
+									$terms_close,
+									$rules_open,
+									$rules_close
+								);
 								?>
 							</label>
 						</p>

@@ -220,8 +220,10 @@ final class Plugin {
 
 		$admin_css_path = LOTTO_PATH . 'assets/css/admin.css';
 		$admin_js_path  = LOTTO_PATH . 'assets/js/admin.js';
+		$orders_js_path = LOTTO_PATH . 'assets/js/orders.js';
 		$admin_css_ver  = \file_exists( $admin_css_path ) ? (string) \filemtime( $admin_css_path ) : $version;
 		$admin_js_ver   = \file_exists( $admin_js_path ) ? (string) \filemtime( $admin_js_path ) : $version;
+		$orders_js_ver  = \file_exists( $orders_js_path ) ? (string) \filemtime( $orders_js_path ) : $version;
 
 		\wp_enqueue_style(
 			'ace-the-catch-admin',
@@ -233,6 +235,9 @@ final class Plugin {
 		$screen = \function_exists( 'get_current_screen' ) ? \get_current_screen() : null;
 		$is_session_editor = $screen instanceof \WP_Screen
 			&& 'catch-the-ace' === ( $screen->post_type ?? '' )
+			&& \in_array( (string) ( $screen->base ?? '' ), array( 'post', 'post-new' ), true );
+		$is_order_editor = $screen instanceof \WP_Screen
+			&& CatchTheAceOrders::POST_TYPE === ( $screen->post_type ?? '' )
 			&& \in_array( (string) ( $screen->base ?? '' ), array( 'post', 'post-new' ), true );
 
 		if ( $is_session_editor && \file_exists( $admin_js_path ) ) {
@@ -266,6 +271,55 @@ final class Plugin {
 					'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 					'ticketSheetWidth' => 2550,
 					'ticketSheetHeight'=> 3300,
+				)
+			);
+		}
+
+		if ( $is_order_editor && \file_exists( $orders_js_path ) ) {
+			$swal_js_rel  = 'node_modules/sweetalert2/dist/sweetalert2.all.min.js';
+			$swal_css_rel = 'node_modules/sweetalert2/dist/sweetalert2.min.css';
+			$swal_js_path = LOTTO_PATH . $swal_js_rel;
+			$swal_css_path = LOTTO_PATH . $swal_css_rel;
+
+			if ( \file_exists( $swal_css_path ) ) {
+				\wp_enqueue_style(
+					'ace-the-catch-sweetalert2',
+					LOTTO_URL . $swal_css_rel,
+					array(),
+					(string) \filemtime( $swal_css_path )
+				);
+			}
+
+			$deps = array( 'jquery' );
+			if ( \file_exists( $swal_js_path ) ) {
+				\wp_enqueue_script(
+					'ace-the-catch-sweetalert2',
+					LOTTO_URL . $swal_js_rel,
+					array(),
+					(string) \filemtime( $swal_js_path ),
+					true
+				);
+				$deps[] = 'ace-the-catch-sweetalert2';
+			}
+
+			\wp_enqueue_script(
+				'ace-the-catch-orders',
+				LOTTO_URL . 'assets/js/orders.js',
+				$deps,
+				$orders_js_ver,
+				true
+			);
+
+			\wp_localize_script(
+				'ace-the-catch-orders',
+				'aceTheCatchOrders',
+				array(
+					'title'             => \__( 'Refund order', 'ace-the-catch' ),
+					'confirmButton'     => \__( 'Refund', 'ace-the-catch' ),
+					'cancelButton'      => \__( 'Cancel', 'ace-the-catch' ),
+					'confirmToken'      => 'REFUND',
+					'inputPlaceholder'  => \__( 'Type REFUND to confirm', 'ace-the-catch' ),
+					'validationMessage' => \__( 'Please type REFUND to confirm.', 'ace-the-catch' ),
 				)
 			);
 		}

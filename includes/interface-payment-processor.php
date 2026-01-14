@@ -92,6 +92,28 @@ interface PaymentProcessor {
 	public function process_payment( array $payload, array $config = array() ): array;
 
 	/**
+	 * Refund a completed payment transaction.
+	 *
+	 * Expected payload keys (optional):
+	 * - order_id: int
+	 * - order_number: int
+	 * - amount: float
+	 * - currency: string
+	 * - reference: string Provider reference from the original payment (e.g., Stripe PaymentIntent id).
+	 * - reason: string Reason (optional, provider-specific).
+	 *
+	 * Return keys (optional):
+	 * - status: string (succeeded|failed|pending)
+	 * - reference: string Refund reference/id when available.
+	 * - error: string Error message.
+	 *
+	 * @param array $payload Refund context (order, amount, reference, etc).
+	 * @param array $config  Provider configuration (API keys, etc).
+	 * @return array Result data (status, reference, error, etc.).
+	 */
+	public function refund_payment( array $payload, array $config = array() ): array;
+
+	/**
 	 * Enqueue any assets needed for the checkout form.
 	 *
 	 * @param array $config Provider configuration.

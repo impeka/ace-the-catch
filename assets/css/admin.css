@@ -46,3 +46,56 @@
 	width: 18px;
 	height: 18px;
 }
+
+.wp-core-ui .button.cta-refund-button {
+	width: 100%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: #d63638;
+	border-color: #b32d2e;
+	color: #fff;
+}
+
+.wp-core-ui .button.cta-refund-button:hover,
+.wp-core-ui .button.cta-refund-button:focus {
+	background: #b32d2e;
+	border-color: #8a2424;
+	color: #fff;
+}
+
+.wp-core-ui .button.cta-refund-button:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #d63638;
+}
+
+.wp-core-ui .button.cta-refund-button:disabled {
+	background: #dcdcde;
+	border-color: #c3c4c7;
+	color: #2c3338;
+	cursor: not-allowed;
+}
+
+.wp-core-ui .button.cta-refund-button .dashicons {
+	margin: 0;
+	line-height: 1;
+}
+
+#cta-order-tickets .cta-ticket--cancelled td {
+	opacity: 0.65;
+}
+
+.cta-order-log__scroll {
+	max-height: 320px;
+	overflow-y: auto;
+	padding-right: 8px;
+}
+
+.cta-order-log__list {
+	margin: 0;
+	padding-left: 18px;
+}
+
+.cta-order-log__list li {
+	margin: 0 0 8px;
+}

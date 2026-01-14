@@ -16,15 +16,15 @@ if ( ! \defined( 'ABSPATH' ) ) {
  * determine if a user is within Ontario.
  *
  * This locator relies on client-side geolocation permission and caches the
- * computed result in a signed cookie for 24 hours.
+ * computed result in a signed cookie for 1 hour.
  */
 class OntarioBrowserGeoLocator implements GeoLocator {
 
 	public const ID = 'ontario_browser';
 
 	private const COOKIE_NAME    = 'ace_ontario_geo';
-	private const COOKIE_VERSION = 1;
-	private const COOKIE_TTL     = 86400; // 24 hours.
+	private const COOKIE_VERSION = 2;
+	private const COOKIE_TTL     = 3600; // 1 hour.
 
 	/**
 	 * Cached geometry.

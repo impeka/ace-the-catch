@@ -13,9 +13,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 class CatchTheAceSessionShortcodes {
 
-	public const SHORTCODE_DRAW_COUNTDOWN        = 'cta_draw_countdown';
-	public const SHORTCODE_SALES_CLOSE_COUNTDOWN = 'cta_tickets_sales_close_countdown';
-	public const SHORTCODE_MINI_CARDS            = 'cta_mini_cards';
+	public const SHORTCODE_DRAW_COUNTDOWN         = 'cta_draw_countdown';
+	public const SHORTCODE_SALES_CLOSE_COUNTDOWN  = 'cta_tickets_sales_close_countdown';
+	public const SHORTCODE_TICKETS_CLOSED_MESSAGE = 'cta_tickets_closed_message';
+	public const SHORTCODE_TICKETS_OPEN_MESSAGE   = 'cta_tickets_open_message';
+	public const SHORTCODE_MINI_CARDS             = 'cta_mini_cards';
 
 	public function __construct() {
 		\add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
@@ -29,6 +31,8 @@ class CatchTheAceSessionShortcodes {
 	public function register(): void {
 		\add_shortcode( self::SHORTCODE_DRAW_COUNTDOWN, array( $this, 'render_draw_countdown' ) );
 		\add_shortcode( self::SHORTCODE_SALES_CLOSE_COUNTDOWN, array( $this, 'render_sales_close_countdown' ) );
+		\add_shortcode( self::SHORTCODE_TICKETS_CLOSED_MESSAGE, array( $this, 'render_tickets_closed_message' ) );
+		\add_shortcode( self::SHORTCODE_TICKETS_OPEN_MESSAGE, array( $this, 'render_tickets_open_message' ) );
 		\add_shortcode( self::SHORTCODE_MINI_CARDS, array( $this, 'render_mini_cards' ) );
 	}
 
@@ -64,6 +68,20 @@ class CatchTheAceSessionShortcodes {
 		$shortcodes = array(
 			self::SHORTCODE_DRAW_COUNTDOWN        => sprintf( '[%s id="%d"]', self::SHORTCODE_DRAW_COUNTDOWN, $post_id ),
 			self::SHORTCODE_SALES_CLOSE_COUNTDOWN => sprintf( '[%s id="%d"]', self::SHORTCODE_SALES_CLOSE_COUNTDOWN, $post_id ),
+			self::SHORTCODE_TICKETS_CLOSED_MESSAGE => sprintf(
+				'[%s id="%d"]%s[/%s]',
+				self::SHORTCODE_TICKETS_CLOSED_MESSAGE,
+				$post_id,
+				\__( 'Ticket sales are currently closed.', 'ace-the-catch' ),
+				self::SHORTCODE_TICKETS_CLOSED_MESSAGE
+			),
+			self::SHORTCODE_TICKETS_OPEN_MESSAGE => sprintf(
+				'[%s id="%d"]%s[/%s]',
+				self::SHORTCODE_TICKETS_OPEN_MESSAGE,
+				$post_id,
+				\__( 'Ticket sales are open.', 'ace-the-catch' ),
+				self::SHORTCODE_TICKETS_OPEN_MESSAGE
+			),
 			self::SHORTCODE_MINI_CARDS            => sprintf( '[%s id="%d" max_width="600px" columns="8"]', self::SHORTCODE_MINI_CARDS, $post_id ),
 		);
 
@@ -219,6 +237,50 @@ class CatchTheAceSessionShortcodes {
 		return '<div class="cta-mini-cards" style="max-width:' . \esc_attr( $max_width ) . ';width:100%;">'
 			. '<div class="card-table cta-mini-cards__table" style="' . \esc_attr( $table_style ) . '">' . \implode( '', $items ) . '</div>'
 			. '</div>';
+	}
+
+	/**
+	 * Shortcode: show content only when ticket sales are closed.
+	 *
+	 * @param array       $atts Attributes.
+	 * @param string|null $content Content.
+	 * @param string      $tag Shortcode tag.
+	 * @return string
+	 */
+	public function render_tickets_closed_message( array $atts = array(), ?string $content = null, string $tag = '' ): string {
+		$session_id = $this->get_session_id_from_atts( $atts, $tag ?: self::SHORTCODE_TICKETS_CLOSED_MESSAGE );
+		if ( $session_id <= 0 ) {
+			return '';
+		}
+
+		$sales_status = $this->get_sales_status( $session_id );
+		if ( ! empty( $sales_status['open'] ) ) {
+			return '';
+		}
+
+		return \do_shortcode( (string) $content );
+	}
+
+	/**
+	 * Shortcode: show content only when ticket sales are open.
+	 *
+	 * @param array       $atts Attributes.
+	 * @param string|null $content Content.
+	 * @param string      $tag Shortcode tag.
+	 * @return string
+	 */
+	public function render_tickets_open_message( array $atts = array(), ?string $content = null, string $tag = '' ): string {
+		$session_id = $this->get_session_id_from_atts( $atts, $tag ?: self::SHORTCODE_TICKETS_OPEN_MESSAGE );
+		if ( $session_id <= 0 ) {
+			return '';
+		}
+
+		$sales_status = $this->get_sales_status( $session_id );
+		if ( empty( $sales_status['open'] ) ) {
+			return '';
+		}
+
+		return \do_shortcode( (string) $content );
 	}
 
 	/**

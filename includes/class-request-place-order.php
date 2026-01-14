@@ -192,7 +192,7 @@ class RequestPlaceOrder implements Request {
 				'success'     => false,
 				'notice'      => array(
 					'type'     => 'error',
-					'message'  => \__( 'You must agree to the terms and conditions to place an order.', 'ace-the-catch' ),
+					'message'  => \__( 'You must agree to the terms and conditions and rules of play to place an order.', 'ace-the-catch' ),
 					'warnings' => $cart_result['warnings'],
 				),
 				'cart_result' => $cart_result,
@@ -203,7 +203,8 @@ class RequestPlaceOrder implements Request {
 			$orders->set_customer( $order_id, $first_name, $last_name, $email, $phone, $location );
 
 			$terms_url = (string) \get_option( CatchTheAceSettings::OPTION_TERMS_URL, '' );
-			$orders->set_terms_acceptance( $order_id, $terms_url );
+			$rules_url = (string) \get_option( CatchTheAceSettings::OPTION_RULES_URL, '' );
+			$orders->set_terms_acceptance( $order_id, $terms_url, $rules_url );
 
 			$benefactor_label = '';
 			if ( $benefactor_term_id > 0 && \taxonomy_exists( CatchTheAceBenefactors::TAXONOMY ) ) {

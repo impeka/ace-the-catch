@@ -197,6 +197,7 @@
 			const sessionId = parseInt( $wrap.data( 'session-id' ) || '0', 10 );
 			const from = String( $( '#cta_ticket_export_from' ).val() || '' );
 			const to = String( $( '#cta_ticket_export_to' ).val() || '' );
+			const includeCancelled = $( '#cta_ticket_export_include_cancelled' ).is( ':checked' ) ? '1' : '0';
 
 			if ( ! sessionId || ! nonce ) {
 				setStatus( $wrap, 'Missing session context.', 'error' );
@@ -220,6 +221,7 @@
 					sessionId,
 					from,
 					to,
+					include_cancelled: includeCancelled,
 				} );
 
 				if ( ! tickets.length ) {

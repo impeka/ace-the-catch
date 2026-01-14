@@ -47,6 +47,14 @@ class DummyPaymentProcessorSuccess implements PaymentProcessor {
 		);
 	}
 
+	public function refund_payment( array $payload, array $config = array() ): array {
+		return array(
+			'status'    => 'succeeded',
+			'reference' => 'refund-dummy-' . wp_generate_uuid4(),
+			'error'     => '',
+		);
+	}
+
 	public function enqueue_checkout_assets( array $config = array() ): void {
 		// No assets needed.
 	}
@@ -89,6 +97,14 @@ class DummyPaymentProcessorFailure implements PaymentProcessor {
 			'status'    => 'failed',
 			'reference' => '',
 			'error'     => \__( 'Dummy processor configured to always fail.', 'ace-the-catch' ),
+		);
+	}
+
+	public function refund_payment( array $payload, array $config = array() ): array {
+		return array(
+			'status'    => 'failed',
+			'reference' => '',
+			'error'     => \__( 'Dummy processor configured to always fail refunds.', 'ace-the-catch' ),
 		);
 	}
 

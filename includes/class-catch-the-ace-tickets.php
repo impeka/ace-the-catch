@@ -17,7 +17,7 @@ class CatchTheAceTickets {
 
 	private const OPTION_DB_VERSION = 'catch_the_ace_tickets_db_version';
 
-	private const DB_VERSION = 1;
+	private const DB_VERSION = 2;
 
 	public const CRON_HOOK_GENERATE_TICKETS = 'catch_the_ace_generate_tickets';
 
@@ -29,6 +29,7 @@ class CatchTheAceTickets {
 	public const STATUS_GENERATE      = 'generate';
 	public const STATUS_IN_PROCESS    = 'in_process';
 	public const STATUS_GENERATED     = 'generated';
+	public const STATUS_CANCELLED     = 'cancelled';
 
 	/**
 	 * Last worker error message (best-effort, per-request).
@@ -122,9 +123,11 @@ class CatchTheAceTickets {
 			order_id bigint(20) unsigned NOT NULL,
 			envelope_number int(11) unsigned NOT NULL,
 			created_at datetime NOT NULL,
+			cancelled_at datetime NULL DEFAULT NULL,
 			PRIMARY KEY  (ticket_id),
 			KEY order_id (order_id),
-			KEY order_envelope (order_id, envelope_number)
+			KEY order_envelope (order_id, envelope_number),
+			KEY order_cancelled (order_id, cancelled_at)
 		) ENGINE=InnoDB {$charset_collate};";
 
 		\dbDelta( $sql );
@@ -182,6 +185,7 @@ class CatchTheAceTickets {
 			self::STATUS_GENERATE      => \__( 'Generate', 'ace-the-catch' ),
 			self::STATUS_IN_PROCESS    => \__( 'In process', 'ace-the-catch' ),
 			self::STATUS_GENERATED     => \__( 'Generated', 'ace-the-catch' ),
+			self::STATUS_CANCELLED     => \__( 'Cancelled', 'ace-the-catch' ),
 		);
 	}
 
@@ -408,6 +412,7 @@ class CatchTheAceTickets {
 				"SELECT envelope_number, COUNT(*) AS qty
 				FROM {$table}
 				WHERE order_id = %d
+					AND (cancelled_at IS NULL OR cancelled_at = '')
 				GROUP BY envelope_number",
 				$order_id
 			),
@@ -480,16 +485,22 @@ class CatchTheAceTickets {
 
 		echo '<p><strong>' . \esc_html__( 'Tickets:', 'ace-the-catch' ) . '</strong> ' . \esc_html( (string) \count( $tickets ) ) . '</p>';
 		echo '<table class="widefat striped" style="max-width: 900px">';
-		echo '<thead><tr><th style="width:140px">' . \esc_html__( 'Ticket #', 'ace-the-catch' ) . '</th><th>' . \esc_html__( 'Envelope', 'ace-the-catch' ) . '</th><th>' . \esc_html__( 'Created', 'ace-the-catch' ) . '</th></tr></thead>';
+		echo '<thead><tr><th style="width:140px">' . \esc_html__( 'Ticket #', 'ace-the-catch' ) . '</th><th>' . \esc_html__( 'Envelope', 'ace-the-catch' ) . '</th><th>' . \esc_html__( 'Created', 'ace-the-catch' ) . '</th><th>' . \esc_html__( 'Cancelled', 'ace-the-catch' ) . '</th></tr></thead>';
 		echo '<tbody>';
 		foreach ( $tickets as $ticket ) {
 			$ticket_id = isset( $ticket['ticket_id'] ) ? (int) $ticket['ticket_id'] : 0;
 			$envelope  = isset( $ticket['envelope_number'] ) ? (int) $ticket['envelope_number'] : 0;
 			$created   = isset( $ticket['created_at'] ) ? (string) $ticket['created_at'] : '';
-			echo '<tr>';
+			$cancelled = isset( $ticket['cancelled_at'] ) ? (string) $ticket['cancelled_at'] : '';
+			if ( '' !== trim( $cancelled ) ) {
+				echo '<tr class="cta-ticket--cancelled">';
+			} else {
+				echo '<tr>';
+			}
 			echo '<td>' . \esc_html( (string) $ticket_id ) . '</td>';
 			echo '<td>' . \esc_html( '#' . (string) $envelope ) . '</td>';
 			echo '<td>' . \esc_html( $created ) . '</td>';
+			echo '<td>' . \esc_html( $cancelled ? $cancelled : '-' ) . '</td>';
 			echo '</tr>';
 		}
 		echo '</tbody>';
@@ -526,6 +537,10 @@ class CatchTheAceTickets {
 		echo '<input type="date" id="cta_ticket_export_to" class="widefat" />';
 		echo '</p>';
 
+		echo '<p style="margin: 10px 0 6px;">';
+		echo '<label><input type="checkbox" id="cta_ticket_export_include_cancelled" value="1" /> ' . \esc_html__( 'Include cancelled tickets', 'ace-the-catch' ) . '</label>';
+		echo '</p>';
+
 		echo '<p style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">';
 		echo '<button type="button" class="button button-secondary" data-cta-ticket-export="csv">' . \esc_html__( 'Export to CSV', 'ace-the-catch' ) . '</button>';
 		echo '<button type="button" class="button button-secondary" data-cta-ticket-export="pdf">' . \esc_html__( 'Print Tickets', 'ace-the-catch' ) . '</button>';
@@ -550,7 +565,7 @@ class CatchTheAceTickets {
 		$table = self::get_table_name();
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT ticket_id, envelope_number, created_at
+				"SELECT ticket_id, envelope_number, created_at, cancelled_at
 				FROM {$table}
 				WHERE order_id = %d
 				ORDER BY ticket_id ASC
@@ -589,6 +604,8 @@ class CatchTheAceTickets {
 
 		$from_raw = isset( $_POST['from'] ) ? \sanitize_text_field( (string) \wp_unslash( $_POST['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$to_raw   = isset( $_POST['to'] ) ? \sanitize_text_field( (string) \wp_unslash( $_POST['to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$include_cancelled = isset( $_POST['include_cancelled'] ) ? \sanitize_text_field( (string) \wp_unslash( $_POST['include_cancelled'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$include_cancelled = ( '1' === $include_cancelled );
 
 		$from_dt = $this->parse_datetime_local( $from_raw, false );
 		$to_dt   = $this->parse_datetime_local( $to_raw, true );
@@ -604,7 +621,8 @@ class CatchTheAceTickets {
 		$tickets = $this->get_tickets_for_session_between(
 			$session_id,
 			$from_dt->format( 'Y-m-d H:i:s' ),
-			$to_dt->format( 'Y-m-d H:i:s' )
+			$to_dt->format( 'Y-m-d H:i:s' ),
+			$include_cancelled
 		);
 
 		\wp_send_json_success(
@@ -663,7 +681,7 @@ class CatchTheAceTickets {
 	 * @param string $to_mysql Inclusive range end (Y-m-d H:i:s).
 	 * @return array<int,array<string,mixed>>
 	 */
-	private function get_tickets_for_session_between( int $session_post_id, string $from_mysql, string $to_mysql ): array {
+	private function get_tickets_for_session_between( int $session_post_id, string $from_mysql, string $to_mysql, bool $include_cancelled = false ): array {
 		global $wpdb;
 		if ( ! ( $wpdb instanceof \wpdb ) ) {
 			return array();
@@ -701,6 +719,8 @@ class CatchTheAceTickets {
 		$k_currency        = \esc_sql( CatchTheAceOrders::META_ORDER_CURRENCY );
 		$k_payment_ref     = \esc_sql( CatchTheAceOrders::META_ORDER_PAYMENT_REFERENCE );
 
+		$cancelled_where = $include_cancelled ? '' : "AND (t.cancelled_at IS NULL OR t.cancelled_at = '')";
+
 		$sql = $wpdb->prepare(
 			"SELECT
 				t.ticket_id AS ticket_number,
@@ -731,6 +751,7 @@ class CatchTheAceTickets {
 				ON pm.post_id = p.ID
 				AND pm.meta_key IN ({$meta_placeholders})
 			WHERE p.post_type = %s
+				{$cancelled_where}
 				AND t.created_at >= %s
 				AND t.created_at <= %s
 			GROUP BY t.ticket_id, t.envelope_number, t.created_at, p.ID, p.post_status, p.post_date

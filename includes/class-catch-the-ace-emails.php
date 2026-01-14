@@ -140,6 +140,82 @@ class CatchTheAceEmails {
 	}
 
 	/**
+	 * Send a refund notification email to the customer (with receipt email BCC).
+	 *
+	 * @param int    $order_id Order post ID.
+	 * @param string $refund_reference Refund reference/id (optional).
+	 * @param string $refund_status Refund status (optional).
+	 * @return bool
+	 */
+	public function send_refund_email( int $order_id, string $refund_reference = '', string $refund_status = '' ): bool {
+		$order_number   = (int) \get_post_meta( $order_id, CatchTheAceOrders::META_ORDER_NUMBER, true );
+		$customer_email = \sanitize_email( (string) \get_post_meta( $order_id, CatchTheAceOrders::META_ORDER_CUSTOMER_EMAIL, true ) );
+		if ( '' === $customer_email ) {
+			$this->orders->append_log( $order_id, \__( 'Refund email not sent: customer email is missing.', 'ace-the-catch' ) );
+			return false;
+		}
+
+		$total    = (float) \get_post_meta( $order_id, CatchTheAceOrders::META_ORDER_TOTAL, true );
+		$currency = (string) \get_post_meta( $order_id, CatchTheAceOrders::META_ORDER_CURRENCY, true );
+		$refund_status = strtolower( trim( $refund_status ) );
+
+		$subject = $order_number > 0
+			? \sprintf( \__( 'Order #%d refunded', 'ace-the-catch' ), $order_number )
+			: \__( 'Order refunded', 'ace-the-catch' );
+
+		$currency_display = $currency ? strtoupper( $currency ) : '';
+		$amount_display = '$' . \number_format_i18n( $total, 2 ) . ( $currency_display ? ' ' . $currency_display : '' );
+
+		$body  = '<p>' . \esc_html__( 'Your order has been refunded.', 'ace-the-catch' ) . '</p>';
+		if ( 'pending' === $refund_status ) {
+			$body .= '<p>' . \esc_html__( 'The refund has been initiated and may take a few business days to appear on your statement.', 'ace-the-catch' ) . '</p>';
+		}
+
+		if ( $order_number > 0 ) {
+			$body .= '<p><strong>' . \esc_html( \sprintf( __( 'Order #%d', 'ace-the-catch' ), $order_number ) ) . '</strong></p>';
+		}
+
+		$body .= '<p><strong>' . \esc_html__( 'Refund Amount:', 'ace-the-catch' ) . '</strong> ' . \esc_html( $amount_display ) . '</p>';
+
+		if ( '' !== trim( $refund_reference ) ) {
+			$body .= '<p><strong>' . \esc_html__( 'Refund Reference:', 'ace-the-catch' ) . '</strong> ' . \esc_html( $refund_reference ) . '</p>';
+		}
+
+		$body .= '<p>' . \esc_html__( 'Any tickets associated with this order have been cancelled and are no longer valid.', 'ace-the-catch' ) . '</p>';
+
+		$cart = $this->orders->get_order_cart( $order_id );
+		if ( ! empty( $cart ) ) {
+			$body .= $this->render_order_table( $cart, $total, $currency );
+		}
+
+		$headers = array();
+		$receipt_email = \sanitize_email( (string) \get_option( CatchTheAceSettings::OPTION_RECEIPT_EMAIL, '' ) );
+		if ( $receipt_email && 0 !== strcasecmp( $receipt_email, $customer_email ) ) {
+			$headers[] = 'Bcc: ' . $receipt_email;
+		}
+		$headers[] = CatchTheAceErrorLogs::HEADER_MARKER;
+		$headers[] = CatchTheAceErrorLogs::HEADER_ORDER . ' ' . (string) $order_id;
+		$headers[] = 'X-Catch-The-Ace-Email: refund';
+
+		$message = new SimpleEmailMessage(
+			array( $customer_email ),
+			$subject,
+			$body,
+			$headers
+		);
+
+		$sent = $this->dispatcher->send( $message );
+		$this->orders->append_log(
+			$order_id,
+			$sent
+				? \sprintf( \__( 'Refund email sent to %s.', 'ace-the-catch' ), $customer_email )
+				: \sprintf( \__( 'Refund email failed to send to %s.', 'ace-the-catch' ), $customer_email )
+		);
+
+		return $sent;
+	}
+
+	/**
 	 * Format option HTML for email usage.
 	 *
 	 * @param string $html Raw option HTML.
@@ -250,6 +326,7 @@ class CatchTheAceEmails {
 				"SELECT ticket_id, envelope_number
 				FROM {$table}
 				WHERE order_id = %d
+					AND (cancelled_at IS NULL OR cancelled_at = '')
 				ORDER BY ticket_id ASC",
 				$order_id
 			),

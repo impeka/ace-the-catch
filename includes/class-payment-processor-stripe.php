@@ -479,6 +479,74 @@ class StripePaymentProcessor implements PaymentProcessor {
 		);
 	}
 
+	public function refund_payment( array $payload, array $config = array() ): array {
+		$reference  = isset( $payload['reference'] ) ? (string) $payload['reference'] : '';
+		$secret_key = isset( $config['secret_key'] ) ? (string) $config['secret_key'] : '';
+
+		if ( '' === $reference ) {
+			return array(
+				'status'    => 'failed',
+				'reference' => '',
+				'error'     => \__( 'Stripe reference missing.', 'ace-the-catch' ),
+			);
+		}
+
+		if ( '' === $secret_key ) {
+			return array(
+				'status'    => 'failed',
+				'reference' => '',
+				'error'     => \__( 'Stripe secret key is not configured.', 'ace-the-catch' ),
+			);
+		}
+
+		$body = array(
+			'payment_intent' => $reference,
+		);
+
+		$reason = isset( $payload['reason'] ) ? trim( (string) $payload['reason'] ) : '';
+		if ( '' !== $reason ) {
+			$body['reason'] = $reason;
+		}
+
+		$order_id = isset( $payload['order_id'] ) ? (int) $payload['order_id'] : 0;
+		if ( $order_id > 0 ) {
+			$body['metadata[order_id]'] = (string) $order_id;
+		}
+
+		$order_number = isset( $payload['order_number'] ) ? (int) $payload['order_number'] : 0;
+		if ( $order_number > 0 ) {
+			$body['metadata[order_number]'] = (string) $order_number;
+		}
+
+		$refund = $this->stripe_request(
+			'POST',
+			'https://api.stripe.com/v1/refunds',
+			$secret_key,
+			$body
+		);
+
+		if ( $refund['code'] >= 400 ) {
+			return array(
+				'status'    => 'failed',
+				'reference' => '',
+				'error'     => $refund['error'] ?: \__( 'Stripe refund failed.', 'ace-the-catch' ),
+			);
+		}
+
+		$refund_id = isset( $refund['data']['id'] ) ? (string) $refund['data']['id'] : '';
+		$status    = isset( $refund['data']['status'] ) ? (string) $refund['data']['status'] : '';
+
+		if ( '' === $status ) {
+			$status = 'succeeded';
+		}
+
+		return array(
+			'status'    => $status,
+			'reference' => $refund_id,
+			'error'     => '',
+		);
+	}
+
 	public function enqueue_checkout_assets( array $config = array() ): void {
 		$publishable_key = isset( $config['publishable_key'] ) ? (string) $config['publishable_key'] : '';
 		if ( empty( $publishable_key ) ) {

@@ -52,6 +52,7 @@ class CatchTheAceOrders {
 	public const META_ORDER_BENEFACTOR_LABEL    = '_cta_order_benefactor_label';
 	public const META_ORDER_TERMS_ACCEPTED_AT   = '_cta_order_terms_accepted_at';
 	public const META_ORDER_TERMS_URL           = '_cta_order_terms_url';
+	public const META_ORDER_RULES_URL           = '_cta_order_rules_url';
 	public const META_TICKET_STATUS = '_cta_ticket_status';
 	public const META_ORDER_LOG = '_cta_order_log';
 
@@ -63,6 +64,9 @@ class CatchTheAceOrders {
 		\add_action( 'init', array( $this, 'register_post_statuses' ) );
 		\add_action( 'init', array( $this, 'ensure_cron_scheduled' ), 30 );
 		\add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
+		\add_action( 'admin_post_cta_resend_receipt', array( $this, 'handle_resend_receipt' ) );
+		\add_action( 'admin_post_cta_resend_tickets', array( $this, 'handle_resend_tickets' ) );
+		\add_action( 'admin_post_cta_refund_order', array( $this, 'handle_refund_order' ) );
 		\add_action( 'save_post_' . self::POST_TYPE, array( $this, 'enforce_order_title' ), 10, 3 );
 		\add_filter( 'manage_edit-' . self::POST_TYPE . '_columns', array( $this, 'filter_admin_columns' ) );
 		\add_filter( 'manage_edit-' . self::POST_TYPE . '_sortable_columns', array( $this, 'filter_sortable_columns' ) );
@@ -899,12 +903,16 @@ class CatchTheAceOrders {
 	 *
 	 * @param int    $order_id Order post ID.
 	 * @param string $terms_url Terms URL used by the user.
+	 * @param string $rules_url Rules of play URL used by the user.
 	 * @return void
 	 */
-	public function set_terms_acceptance( int $order_id, string $terms_url = '' ): void {
+	public function set_terms_acceptance( int $order_id, string $terms_url = '', string $rules_url = '' ): void {
 		\update_post_meta( $order_id, self::META_ORDER_TERMS_ACCEPTED_AT, \current_time( 'mysql' ) );
 		if ( $terms_url ) {
 			\update_post_meta( $order_id, self::META_ORDER_TERMS_URL, $terms_url );
+		}
+		if ( $rules_url ) {
+			\update_post_meta( $order_id, self::META_ORDER_RULES_URL, $rules_url );
 		}
 	}
 
@@ -1251,6 +1259,454 @@ class CatchTheAceOrders {
 			'normal',
 			'high'
 		);
+
+		\add_meta_box(
+			'cta-order-log',
+			\__( 'Order Log', 'ace-the-catch' ),
+			array( $this, 'render_order_log_meta_box' ),
+			self::POST_TYPE,
+			'normal',
+			'default'
+		);
+
+		\add_meta_box(
+			'cta-order-refund',
+			\__( 'Refund', 'ace-the-catch' ),
+			array( $this, 'render_order_refund_meta_box' ),
+			self::POST_TYPE,
+			'side',
+			'low'
+		);
+
+		\add_meta_box(
+			'cta-order-email-actions',
+			\__( 'Email Actions', 'ace-the-catch' ),
+			array( $this, 'render_order_email_actions_meta_box' ),
+			self::POST_TYPE,
+			'side',
+			'low'
+		);
+	}
+
+	/**
+	 * Render the order log meta box.
+	 *
+	 * @param \WP_Post $post Post object.
+	 * @return void
+	 */
+	public function render_order_log_meta_box( \WP_Post $post ): void {
+		$log = \get_post_meta( $post->ID, self::META_ORDER_LOG, true );
+		if ( ! \is_array( $log ) || empty( $log ) ) {
+			echo '<p class="description">' . \esc_html__( 'No log entries yet.', 'ace-the-catch' ) . '</p>';
+			return;
+		}
+
+		echo '<div class="cta-order-log__scroll">';
+		echo '<ol class="cta-order-log__list">';
+		foreach ( $log as $entry ) {
+			if ( ! \is_array( $entry ) ) {
+				continue;
+			}
+			$time    = isset( $entry['time'] ) ? (string) $entry['time'] : '';
+			$message = isset( $entry['message'] ) ? (string) $entry['message'] : '';
+			if ( '' === $time && '' === $message ) {
+				continue;
+			}
+			echo '<li><strong>' . \esc_html( $time ) . '</strong> - ' . \esc_html( $message ) . '</li>';
+		}
+		echo '</ol>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render refund action meta box.
+	 *
+	 * @param \WP_Post $post Post object.
+	 * @return void
+	 */
+	public function render_order_refund_meta_box( \WP_Post $post ): void {
+		$order_id = (int) $post->ID;
+
+		$status        = (string) $post->post_status;
+		$ticket_status = (string) \get_post_meta( $order_id, self::META_TICKET_STATUS, true );
+		$order_number  = (int) \get_post_meta( $order_id, self::META_ORDER_NUMBER, true );
+		$total_amount  = (float) \get_post_meta( $order_id, self::META_ORDER_TOTAL, true );
+		$currency      = (string) \get_post_meta( $order_id, self::META_ORDER_CURRENCY, true );
+
+		$refund_enabled = true;
+		$disabled_reasons = array();
+
+		if ( self::STATUS_REFUNDED === $status ) {
+			$refund_enabled = false;
+			$disabled_reasons[] = \__( 'Order is already refunded.', 'ace-the-catch' );
+		}
+
+		if ( self::STATUS_COMPLETED !== $status ) {
+			$refund_enabled = false;
+			$disabled_reasons[] = \__( 'Only completed orders can be refunded.', 'ace-the-catch' );
+		}
+
+		if ( CatchTheAceTickets::STATUS_IN_PROCESS === $ticket_status ) {
+			$refund_enabled = false;
+			$disabled_reasons[] = \__( 'Tickets are currently being generated.', 'ace-the-catch' );
+		}
+
+		$processor_key = (string) \get_post_meta( $order_id, self::META_ORDER_PAYMENT_PROCESSOR, true );
+		$payment_reference = (string) \get_post_meta( $order_id, self::META_ORDER_PAYMENT_REFERENCE, true );
+		if ( '' === trim( $processor_key ) || '' === trim( $payment_reference ) ) {
+			$refund_enabled = false;
+			$disabled_reasons[] = \__( 'Payment information is missing on this order.', 'ace-the-catch' );
+		}
+
+		$notice_key = isset( $_GET['cta_order_notice'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['cta_order_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$notice_map = array(
+			'refund_succeeded'        => array( 'success', \__( 'Refund completed and tickets cancelled.', 'ace-the-catch' ) ),
+			'refund_failed'           => array( 'error', \__( 'Refund failed. Check the order log for details.', 'ace-the-catch' ) ),
+			'refund_disabled'         => array( 'warning', \__( 'Refund is only available for completed orders.', 'ace-the-catch' ) ),
+			'refund_already'          => array( 'info', \__( 'Order is already refunded.', 'ace-the-catch' ) ),
+			'refund_blocked_generating' => array( 'warning', \__( 'Refund is temporarily disabled while tickets are being generated.', 'ace-the-catch' ) ),
+		);
+		if ( $notice_key && isset( $notice_map[ $notice_key ] ) ) {
+			$notice_type = $notice_map[ $notice_key ][0] ?? 'info';
+			$notice_text = $notice_map[ $notice_key ][1] ?? '';
+			$notice_class = 'notice notice-' . $notice_type;
+			echo '<div class="' . \esc_attr( $notice_class ) . '" style="margin: 0 0 10px 0;"><p style="margin:6px 0;">' . \esc_html( (string) $notice_text ) . '</p></div>';
+		}
+
+		$refund_url = \wp_nonce_url(
+			\admin_url( 'admin-post.php?action=cta_refund_order&order_id=' . (string) $order_id ),
+			'cta_refund_order_' . (string) $order_id
+		);
+
+		$currency_display = $currency ? strtoupper( $currency ) : '';
+		$amount_display = '$' . \number_format_i18n( $total_amount, 2 ) . ( $currency_display ? ' ' . $currency_display : '' );
+
+		if ( $refund_enabled ) {
+			echo '<button type="button" class="button cta-refund-button" data-cta-refund-url="' . \esc_url( $refund_url ) . '" data-cta-order-number="' . \esc_attr( (string) $order_number ) . '" data-cta-order-total="' . \esc_attr( (string) $total_amount ) . '" data-cta-order-amount-display="' . \esc_attr( $amount_display ) . '">' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				. '<span class="dashicons dashicons-money-alt" aria-hidden="true"></span>'
+				. \esc_html__( 'Refund Order', 'ace-the-catch' )
+				. '</button>';
+		} else {
+			echo '<button type="button" class="button cta-refund-button" disabled>'
+				. '<span class="dashicons dashicons-money-alt" aria-hidden="true"></span>'
+				. \esc_html__( 'Refund Order', 'ace-the-catch' )
+				. '</button>';
+		}
+
+		echo '<p class="description" style="margin: 10px 0 0;">' . \esc_html__( 'Refunds the customer and cancels all tickets for this order.', 'ace-the-catch' ) . '</p>';
+
+		if ( ! empty( $disabled_reasons ) ) {
+			echo '<p class="description" style="margin: 6px 0 0;">' . \esc_html( \implode( ' ', $disabled_reasons ) ) . '</p>';
+		}
+	}
+
+	/**
+	 * Render order email action buttons meta box.
+	 *
+	 * @param \WP_Post $post Post object.
+	 * @return void
+	 */
+	public function render_order_email_actions_meta_box( \WP_Post $post ): void {
+		$ticket_status = (string) \get_post_meta( $post->ID, self::META_TICKET_STATUS, true );
+
+		$receipt_enabled = ( self::STATUS_COMPLETED === $post->post_status );
+		$tickets_enabled = ( CatchTheAceTickets::STATUS_GENERATED === $ticket_status );
+
+		$notice_key = isset( $_GET['cta_order_notice'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['cta_order_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$notice_map = array(
+			'receipt_sent'     => array( 'success', \__( 'Receipt email sent.', 'ace-the-catch' ) ),
+			'receipt_failed'   => array( 'error', \__( 'Receipt email failed to send.', 'ace-the-catch' ) ),
+			'receipt_disabled' => array( 'warning', \__( 'Receipt can only be resent for completed orders.', 'ace-the-catch' ) ),
+			'tickets_sent'     => array( 'success', \__( 'Ticket email sent.', 'ace-the-catch' ) ),
+			'tickets_failed'   => array( 'error', \__( 'Ticket email failed to send.', 'ace-the-catch' ) ),
+			'tickets_disabled' => array( 'warning', \__( 'Tickets can only be resent after they have been generated.', 'ace-the-catch' ) ),
+		);
+		if ( $notice_key && isset( $notice_map[ $notice_key ] ) ) {
+			$notice_type = $notice_map[ $notice_key ][0] ?? 'info';
+			$notice_text = $notice_map[ $notice_key ][1] ?? '';
+			$notice_class = 'notice notice-' . $notice_type;
+			echo '<div class="' . \esc_attr( $notice_class ) . '" style="margin: 0 0 10px 0;"><p style="margin:6px 0;">' . \esc_html( (string) $notice_text ) . '</p></div>';
+		}
+
+		$receipt_url = \wp_nonce_url(
+			\admin_url( 'admin-post.php?action=cta_resend_receipt&order_id=' . (string) $post->ID ),
+			'cta_resend_receipt_' . (string) $post->ID
+		);
+		$tickets_url = \wp_nonce_url(
+			\admin_url( 'admin-post.php?action=cta_resend_tickets&order_id=' . (string) $post->ID ),
+			'cta_resend_tickets_' . (string) $post->ID
+		);
+
+		echo '<p style="margin: 0 0 8px;">';
+		if ( $receipt_enabled ) {
+			echo '<a class="button button-secondary" style="width:100%;text-align:center;" href="' . \esc_url( $receipt_url ) . '">' . \esc_html__( 'Resend receipt', 'ace-the-catch' ) . '</a>';
+		} else {
+			echo '<button type="button" class="button button-secondary" style="width:100%;" disabled>' . \esc_html__( 'Resend receipt', 'ace-the-catch' ) . '</button>';
+		}
+		echo '</p>';
+
+		echo '<p style="margin: 0 0 8px;">';
+		if ( $tickets_enabled ) {
+			echo '<a class="button button-secondary" style="width:100%;text-align:center;" href="' . \esc_url( $tickets_url ) . '">' . \esc_html__( 'Resend tickets', 'ace-the-catch' ) . '</a>';
+		} else {
+			echo '<button type="button" class="button button-secondary" style="width:100%;" disabled>' . \esc_html__( 'Resend tickets', 'ace-the-catch' ) . '</button>';
+		}
+		echo '</p>';
+
+		if ( ! $receipt_enabled || ! $tickets_enabled ) {
+			echo '<p class="description" style="margin: 0;">';
+			$messages = array();
+			if ( ! $receipt_enabled ) {
+				$messages[] = \__( 'Receipt is available once the order is completed.', 'ace-the-catch' );
+			}
+			if ( ! $tickets_enabled ) {
+				$messages[] = \__( 'Tickets are available once they have been generated.', 'ace-the-catch' );
+			}
+			echo \esc_html( \implode( ' ', $messages ) );
+			echo '</p>';
+		}
+	}
+
+	/**
+	 * Admin action: resend transaction receipt email.
+	 *
+	 * @return void
+	 */
+	public function handle_resend_receipt(): void {
+		$order_id = isset( $_REQUEST['order_id'] ) ? (int) \wp_unslash( $_REQUEST['order_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $order_id <= 0 || self::POST_TYPE !== \get_post_type( $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 400 ) );
+		}
+
+		if ( ! \current_user_can( 'edit_post', $order_id ) ) {
+			\wp_die( \esc_html__( 'Unauthorized.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$nonce = isset( $_REQUEST['_wpnonce'] ) ? \sanitize_text_field( (string) \wp_unslash( $_REQUEST['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! \wp_verify_nonce( $nonce, 'cta_resend_receipt_' . (string) $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$status = (string) \get_post_status( $order_id );
+		if ( self::STATUS_COMPLETED !== $status ) {
+			$this->redirect_to_order_with_notice( $order_id, 'receipt_disabled' );
+		}
+
+		$sent = Plugin::instance()->get_emails()->send_successful_transaction_email( $order_id );
+		$this->redirect_to_order_with_notice( $order_id, $sent ? 'receipt_sent' : 'receipt_failed' );
+	}
+
+	/**
+	 * Admin action: resend ticket delivery email.
+	 *
+	 * @return void
+	 */
+	public function handle_resend_tickets(): void {
+		$order_id = isset( $_REQUEST['order_id'] ) ? (int) \wp_unslash( $_REQUEST['order_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $order_id <= 0 || self::POST_TYPE !== \get_post_type( $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 400 ) );
+		}
+
+		if ( ! \current_user_can( 'edit_post', $order_id ) ) {
+			\wp_die( \esc_html__( 'Unauthorized.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$nonce = isset( $_REQUEST['_wpnonce'] ) ? \sanitize_text_field( (string) \wp_unslash( $_REQUEST['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! \wp_verify_nonce( $nonce, 'cta_resend_tickets_' . (string) $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$ticket_status = (string) \get_post_meta( $order_id, self::META_TICKET_STATUS, true );
+		if ( CatchTheAceTickets::STATUS_GENERATED !== $ticket_status ) {
+			$this->redirect_to_order_with_notice( $order_id, 'tickets_disabled' );
+		}
+
+		$sent = Plugin::instance()->get_emails()->send_ticket_delivery_email( $order_id );
+		$this->redirect_to_order_with_notice( $order_id, $sent ? 'tickets_sent' : 'tickets_failed' );
+	}
+
+	/**
+	 * Admin action: refund an order and cancel its tickets.
+	 *
+	 * @return void
+	 */
+	public function handle_refund_order(): void {
+		$order_id = isset( $_REQUEST['order_id'] ) ? (int) \wp_unslash( $_REQUEST['order_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $order_id <= 0 || self::POST_TYPE !== \get_post_type( $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 400 ) );
+		}
+
+		if ( ! \current_user_can( 'edit_post', $order_id ) ) {
+			\wp_die( \esc_html__( 'Unauthorized.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$nonce = isset( $_REQUEST['_wpnonce'] ) ? \sanitize_text_field( (string) \wp_unslash( $_REQUEST['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! \wp_verify_nonce( $nonce, 'cta_refund_order_' . (string) $order_id ) ) {
+			\wp_die( \esc_html__( 'Invalid request.', 'ace-the-catch' ), '', array( 'response' => 403 ) );
+		}
+
+		$status = (string) \get_post_status( $order_id );
+		if ( self::STATUS_REFUNDED === $status ) {
+			$this->redirect_to_order_with_notice( $order_id, 'refund_already' );
+		}
+
+		if ( self::STATUS_COMPLETED !== $status ) {
+			$this->redirect_to_order_with_notice( $order_id, 'refund_disabled' );
+		}
+
+		$ticket_status = (string) \get_post_meta( $order_id, self::META_TICKET_STATUS, true );
+		if ( CatchTheAceTickets::STATUS_IN_PROCESS === $ticket_status ) {
+			$this->redirect_to_order_with_notice( $order_id, 'refund_blocked_generating' );
+		}
+
+		$processor_key = (string) \get_post_meta( $order_id, self::META_ORDER_PAYMENT_PROCESSOR, true );
+		$processor_key = trim( $processor_key );
+		if ( '' === $processor_key ) {
+			$this->append_log( $order_id, \__( 'Refund failed: payment processor is missing on the order.', 'ace-the-catch' ) );
+			$this->redirect_to_order_with_notice( $order_id, 'refund_failed' );
+		}
+
+		$processor = Plugin::instance()->get_payment_processor_factory()->create( $processor_key );
+		if ( ! $processor ) {
+			$this->append_log( $order_id, \sprintf( \__( 'Refund failed: payment processor "%s" is not available.', 'ace-the-catch' ), $processor_key ) );
+			$this->redirect_to_order_with_notice( $order_id, 'refund_failed' );
+		}
+
+		$payment_reference = (string) \get_post_meta( $order_id, self::META_ORDER_PAYMENT_REFERENCE, true );
+		$payment_reference = trim( $payment_reference );
+		if ( '' === $payment_reference ) {
+			$this->append_log( $order_id, \__( 'Refund failed: payment reference is missing on the order.', 'ace-the-catch' ) );
+			$this->redirect_to_order_with_notice( $order_id, 'refund_failed' );
+		}
+
+		$total_amount = (float) \get_post_meta( $order_id, self::META_ORDER_TOTAL, true );
+		$currency     = (string) \get_post_meta( $order_id, self::META_ORDER_CURRENCY, true );
+		$order_number = (int) \get_post_meta( $order_id, self::META_ORDER_NUMBER, true );
+
+		$config = $this->get_payment_processor_config( $processor_key );
+		$refund_result = $processor->refund_payment(
+			array(
+				'order_id'     => $order_id,
+				'order_number' => $order_number,
+				'amount'       => $total_amount,
+				'currency'     => $currency,
+				'reference'    => $payment_reference,
+			),
+			$config
+		);
+
+		$refund_status = isset( $refund_result['status'] ) ? (string) $refund_result['status'] : 'failed';
+		$refund_ref    = isset( $refund_result['reference'] ) ? (string) $refund_result['reference'] : '';
+		$refund_error  = isset( $refund_result['error'] ) ? (string) $refund_result['error'] : \__( 'Refund failed.', 'ace-the-catch' );
+
+		$user = \wp_get_current_user();
+		$user_label = ( $user instanceof \WP_User && $user->exists() )
+			? trim( (string) ( $user->display_name ?: $user->user_login ) ) . ' (ID ' . (string) $user->ID . ')'
+			: \__( 'Unknown user', 'ace-the-catch' );
+
+		if ( 'succeeded' !== $refund_status && 'pending' !== $refund_status ) {
+			$this->append_log(
+				$order_id,
+				\sprintf(
+					/* translators: 1: user label, 2: refund error */
+					\__( 'Refund failed by %1$s: %2$s', 'ace-the-catch' ),
+					$user_label,
+					$refund_error
+				)
+			);
+			$this->redirect_to_order_with_notice( $order_id, 'refund_failed' );
+		}
+
+		$cancelled_at = \current_time( 'mysql' );
+		$cancelled_count = $this->cancel_tickets_for_order( $order_id, $cancelled_at );
+
+		\update_post_meta( $order_id, self::META_TICKET_STATUS, CatchTheAceTickets::STATUS_CANCELLED );
+		$this->set_order_status( $order_id, self::STATUS_REFUNDED );
+
+		$this->append_log(
+			$order_id,
+			\sprintf(
+				/* translators: 1: user label, 2: refund reference, 3: ticket count */
+				\__( 'Order refunded by %1$s (refund ref: %2$s). Tickets cancelled: %3$d.', 'ace-the-catch' ),
+				$user_label,
+				$refund_ref ? $refund_ref : '-',
+				$cancelled_count
+			),
+			array(
+				'refund_status' => $refund_status,
+				'refund_ref'    => $refund_ref,
+				'processor'     => $processor_key,
+				'cancelled_at'  => $cancelled_at,
+				'cancelled_tickets' => $cancelled_count,
+			)
+		);
+
+		Plugin::instance()->get_emails()->send_refund_email( $order_id, $refund_ref, $refund_status );
+
+		$this->redirect_to_order_with_notice( $order_id, 'refund_succeeded' );
+	}
+
+	/**
+	 * Get payment processor config array for a given provider key.
+	 *
+	 * @param string $processor_key Provider key.
+	 * @return array
+	 */
+	private function get_payment_processor_config( string $processor_key ): array {
+		$configs = \get_option( CatchTheAceSettings::OPTION_PAYMENT_PROC_CFG, array() );
+		if ( ! \is_array( $configs ) || empty( $configs[ $processor_key ] ) || ! \is_array( $configs[ $processor_key ] ) ) {
+			return array();
+		}
+
+		return $configs[ $processor_key ];
+	}
+
+	/**
+	 * Cancel all tickets for an order by setting cancelled_at.
+	 *
+	 * @param int    $order_id Order post ID.
+	 * @param string $cancelled_at MySQL datetime string.
+	 * @return int Number of tickets cancelled.
+	 */
+	private function cancel_tickets_for_order( int $order_id, string $cancelled_at ): int {
+		global $wpdb;
+		if ( ! ( $wpdb instanceof \wpdb ) ) {
+			return 0;
+		}
+
+		$table = CatchTheAceTickets::get_table_name();
+		$affected = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$table}
+				SET cancelled_at = %s
+				WHERE order_id = %d
+					AND (cancelled_at IS NULL OR cancelled_at = '')",
+				$cancelled_at,
+				$order_id
+			)
+		);
+
+		return \is_int( $affected ) && $affected > 0 ? $affected : 0;
+	}
+
+	/**
+	 * Redirect back to the order edit screen with an inline notice key.
+	 *
+	 * @param int    $order_id Order post ID.
+	 * @param string $notice_key Notice key.
+	 * @return void
+	 */
+	private function redirect_to_order_with_notice( int $order_id, string $notice_key ): void {
+		$redirect = \wp_get_referer();
+		if ( ! $redirect ) {
+			$redirect = \admin_url( 'post.php?post=' . $order_id . '&action=edit' );
+		}
+
+		$redirect = \remove_query_arg( array( 'cta_order_notice' ), $redirect );
+		$redirect = \add_query_arg( 'cta_order_notice', $notice_key, $redirect );
+
+		\wp_safe_redirect( $redirect );
+		exit;
 	}
 
 	/**
@@ -1274,9 +1730,9 @@ class CatchTheAceOrders {
 		$benefactor_label   = (string) \get_post_meta( $post->ID, self::META_ORDER_BENEFACTOR_LABEL, true );
 		$terms_accepted_at  = (string) \get_post_meta( $post->ID, self::META_ORDER_TERMS_ACCEPTED_AT, true );
 		$terms_url          = (string) \get_post_meta( $post->ID, self::META_ORDER_TERMS_URL, true );
+		$rules_url          = (string) \get_post_meta( $post->ID, self::META_ORDER_RULES_URL, true );
 		$ticket_status = (string) \get_post_meta( $post->ID, self::META_TICKET_STATUS, true );
 		$cart         = \get_post_meta( $post->ID, self::META_ORDER_CART, true );
-		$log          = \get_post_meta( $post->ID, self::META_ORDER_LOG, true );
 
 		$statuses = $this->get_statuses();
 		$status_label = isset( $statuses[ $post->post_status ] ) ? $statuses[ $post->post_status ] : $post->post_status;
@@ -1311,8 +1767,15 @@ class CatchTheAceOrders {
 		echo '<tr><th>' . \esc_html__( 'Terms Accepted', 'ace-the-catch' ) . '</th><td>';
 		if ( $terms_accepted_at ) {
 			echo \esc_html( $terms_accepted_at );
+			$links = array();
 			if ( $terms_url ) {
-				echo ' &mdash; <a href="' . \esc_url( $terms_url ) . '" target="_blank" rel="noopener noreferrer">' . \esc_html__( 'View terms', 'ace-the-catch' ) . '</a>';
+				$links[] = '<a href="' . \esc_url( $terms_url ) . '" target="_blank" rel="noopener noreferrer">' . \esc_html__( 'View terms', 'ace-the-catch' ) . '</a>';
+			}
+			if ( $rules_url ) {
+				$links[] = '<a href="' . \esc_url( $rules_url ) . '" target="_blank" rel="noopener noreferrer">' . \esc_html__( 'View rules of play', 'ace-the-catch' ) . '</a>';
+			}
+			if ( ! empty( $links ) ) {
+				echo ' &mdash; ' . \implode( ' | ', $links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		} else {
 			echo '-';
@@ -1344,27 +1807,6 @@ class CatchTheAceOrders {
 			echo '</tbody>';
 			echo '</table>';
 		}
-
-		echo '<h3 style="margin-top:16px">' . \esc_html__( 'Log', 'ace-the-catch' ) . '</h3>';
-
-		if ( ! \is_array( $log ) || empty( $log ) ) {
-			echo '<p class="description">' . \esc_html__( 'No log entries yet.', 'ace-the-catch' ) . '</p>';
-			return;
-		}
-
-		echo '<ol style="max-width: 900px">';
-		foreach ( $log as $entry ) {
-			if ( ! \is_array( $entry ) ) {
-				continue;
-			}
-			$time    = isset( $entry['time'] ) ? (string) $entry['time'] : '';
-			$message = isset( $entry['message'] ) ? (string) $entry['message'] : '';
-			if ( '' === $time && '' === $message ) {
-				continue;
-			}
-			echo '<li><strong>' . \esc_html( $time ) . '</strong> - ' . \esc_html( $message ) . '</li>';
-		}
-		echo '</ol>';
 	}
 
 	/**
@@ -1582,6 +2024,7 @@ class CatchTheAceOrders {
 			CatchTheAceTickets::STATUS_GENERATE      => \__( 'Generate', 'ace-the-catch' ),
 			CatchTheAceTickets::STATUS_IN_PROCESS    => \__( 'In process', 'ace-the-catch' ),
 			CatchTheAceTickets::STATUS_GENERATED     => \__( 'Generated', 'ace-the-catch' ),
+			CatchTheAceTickets::STATUS_CANCELLED     => \__( 'Cancelled', 'ace-the-catch' ),
 			'not generated' => \__( 'Not generated', 'ace-the-catch' ),
 		);
 

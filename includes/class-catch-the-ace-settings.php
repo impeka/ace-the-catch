@@ -15,6 +15,7 @@ class CatchTheAceSettings {
 
 	const OPTION_TICKET_PRICE      = 'catch_the_ace_ticket_price';
 	const OPTION_TERMS_URL         = 'catch_the_ace_terms_url';
+	const OPTION_RULES_URL         = 'catch_the_ace_rules_url';
 	const OPTION_RECEIPT_EMAIL     = 'catch_the_ace_receipt_email';
 	const OPTION_PAYMENT_PROC      = 'catch_the_ace_payment_processor';
 	const OPTION_PAYMENT_PROC_CFG  = 'catch_the_ace_payment_processor_configs';
@@ -129,6 +130,16 @@ class CatchTheAceSettings {
 		\register_setting(
 			$group_tickets,
 			self::OPTION_TERMS_URL,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
+				'default'           => '',
+			)
+		);
+
+		\register_setting(
+			$group_tickets,
+			self::OPTION_RULES_URL,
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'esc_url_raw',
@@ -260,6 +271,14 @@ class CatchTheAceSettings {
 			self::OPTION_TERMS_URL,
 			\__( 'Terms & Conditions URL', 'ace-the-catch' ),
 			array( $this, 'render_terms_field' ),
+			$page_tickets,
+			'catch_the_ace_tickets_section'
+		);
+
+		\add_settings_field(
+			self::OPTION_RULES_URL,
+			\__( 'Rules of Play URL', 'ace-the-catch' ),
+			array( $this, 'render_rules_field' ),
 			$page_tickets,
 			'catch_the_ace_tickets_section'
 		);
@@ -504,6 +523,12 @@ class CatchTheAceSettings {
 		$value = \get_option( self::OPTION_TERMS_URL, '' );
 		echo '<input type="url" class="regular-text" name="' . \esc_attr( self::OPTION_TERMS_URL ) . '" value="' . \esc_attr( $value ) . '" />';
 		echo '<p class="description">' . \esc_html__( 'Link to the terms and conditions page.', 'ace-the-catch' ) . '</p>';
+	}
+
+	public function render_rules_field(): void {
+		$value = \get_option( self::OPTION_RULES_URL, '' );
+		echo '<input type="url" class="regular-text" name="' . \esc_attr( self::OPTION_RULES_URL ) . '" value="' . \esc_attr( $value ) . '" />';
+		echo '<p class="description">' . \esc_html__( 'Link to the rules of play page.', 'ace-the-catch' ) . '</p>';
 	}
 
 	public function render_email_field(): void {

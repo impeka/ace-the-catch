@@ -45,6 +45,7 @@ class CatchTheAceCheckout {
 	 *   benefactors:array<int,array{term_id:int,name:string,slug:string}>,
 	 *   selected_benefactor:int,
 	 *   terms_url:string,
+	 *   rules_url:string,
 	 *   checkout_url:string
 	 * }
 	 */
@@ -56,6 +57,7 @@ class CatchTheAceCheckout {
 		$notice       = $this->consume_notice_cookie();
 		$currency     = $this->get_currency();
 		$terms_url    = $this->get_terms_url();
+		$rules_url    = $this->get_rules_url();
 		$benefactors  = $this->get_session_benefactors( $post_id );
 
 		$geo = $this->evaluate_geo();
@@ -83,6 +85,7 @@ class CatchTheAceCheckout {
 				'benefactors'     => $benefactors,
 				'selected_benefactor' => 0,
 				'terms_url'       => $terms_url,
+				'rules_url'       => $rules_url,
 				'checkout_url'    => $checkout_url,
 			);
 		}
@@ -189,6 +192,7 @@ class CatchTheAceCheckout {
 			'benefactors'     => $benefactors,
 			'selected_benefactor' => $selected_benefactor,
 			'terms_url'       => $terms_url,
+			'rules_url'       => $rules_url,
 			'checkout_url'    => $checkout_url,
 		);
 	}
@@ -409,6 +413,17 @@ class CatchTheAceCheckout {
 	 */
 	private function get_terms_url(): string {
 		$url = (string) \get_option( CatchTheAceSettings::OPTION_TERMS_URL, '' );
+		$url = trim( $url );
+		return $url;
+	}
+
+	/**
+	 * Get the configured Rules of Play URL.
+	 *
+	 * @return string
+	 */
+	private function get_rules_url(): string {
+		$url = (string) \get_option( CatchTheAceSettings::OPTION_RULES_URL, '' );
 		$url = trim( $url );
 		return $url;
 	}
