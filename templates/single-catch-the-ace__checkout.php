@@ -14,6 +14,8 @@ $checkout_model = new \Impeka\Lotto\CatchTheAceCheckout();
 $view           = $checkout_model->build_view_model( $post_id );
 
 $geo_needs_location = ! empty( $view['geo_needs_location'] );
+$sales_open         = ! isset( $view['sales_open'] ) || (bool) $view['sales_open'];
+$sales_message      = isset( $view['sales_message'] ) ? (string) $view['sales_message'] : __( 'Ticket sales are currently closed.', 'ace-the-catch' );
 
 if ( $view['geo_blocked'] && ! $geo_needs_location ) {
 	wp_safe_redirect( $view['back_url'] );
@@ -83,6 +85,11 @@ get_header();
 					<button type="button" class="button button-primary ace-geo-request"><?php esc_html_e( 'Enable location', 'ace-the-catch' ); ?></button>
 					<a class="button" href="<?php echo esc_url( $back_url ); ?>"><?php esc_html_e( 'Return to game', 'ace-the-catch' ); ?></a>
 				</p>
+			<?php elseif ( ! $sales_open ) : ?>
+				<div class="notice notice-warning">
+					<p><?php echo esc_html( $sales_message ); ?></p>
+				</div>
+				<p><a class="button" href="<?php echo esc_url( $back_url ); ?>"><?php esc_html_e( 'Return to game', 'ace-the-catch' ); ?></a></p>
 			<?php elseif ( empty( $cart_items ) ) : ?>
 				<?php if ( 'success' !== ( $notice['type'] ?? '' ) ) : ?>
 					<p><?php esc_html_e( 'Your cart is empty or invalid. Please go back and select envelopes.', 'ace-the-catch' ); ?></p>

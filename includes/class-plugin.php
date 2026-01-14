@@ -17,6 +17,16 @@ if ( ! \defined( 'ABSPATH' ) ) {
 final class Plugin {
 
 	/**
+	 * Cookie used to make WordPress nonces unique for logged-out visitors.
+	 */
+	private const NONCE_SEED_COOKIE = 'ace_nonce_seed';
+
+	/**
+	 * TTL for the nonce seed cookie (30 days).
+	 */
+	private const NONCE_SEED_TTL = 2592000;
+
+	/**
 	 * The singleton instance.
 	 *
 	 * @var Plugin|null
@@ -132,7 +142,7 @@ final class Plugin {
 	 * Private constructor to enforce singleton.
 	 */
 	private function __construct() {
-		$this->version = \defined( 'LOTTO_VERSION' ) ? LOTTO_VERSION : '0.8.0';
+		$this->version = \defined( 'LOTTO_VERSION' ) ? LOTTO_VERSION : '1.0.0';
 
 		$this->payment_processor_factory = new PaymentProcessorFactory();
 		$this->register_builtin_payment_processors();
@@ -176,10 +186,82 @@ final class Plugin {
 		\add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		\add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
+		\add_action( 'init', array( $this, 'ensure_nonce_seed_cookie' ), 1 );
 		\add_action( 'init', array( $this, 'maybe_upgrade' ), 20 );
 		\add_action( 'init', array( $this, 'register_shortcodes' ) );
 		\add_action( 'wp_ajax_ace_the_catch_geo_locate', array( $this, 'ajax_geo_locate' ) );
 		\add_action( 'wp_ajax_nopriv_ace_the_catch_geo_locate', array( $this, 'ajax_geo_locate' ) );
+		\add_filter( 'nonce_user_logged_out', array( $this, 'filter_nonce_user_logged_out' ), 10, 2 );
+	}
+
+	/**
+	 * Ensure a stable, visitor-specific cookie exists so WordPress nonces for logged-out
+	 * users are not shared across all anonymous visitors.
+	 *
+	 * @return void
+	 */
+	public function ensure_nonce_seed_cookie(): void {
+		if ( \headers_sent() ) {
+			return;
+		}
+
+		$seed = isset( $_COOKIE[ self::NONCE_SEED_COOKIE ] ) ? \sanitize_text_field( (string) \wp_unslash( $_COOKIE[ self::NONCE_SEED_COOKIE ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+		if ( '' !== $seed ) {
+			return;
+		}
+
+		try {
+			$seed = \bin2hex( \random_bytes( 16 ) );
+		} catch ( \Throwable $e ) {
+			$seed = \wp_generate_password( 32, false, false );
+		}
+
+		$expires = \time() + self::NONCE_SEED_TTL;
+		$secure  = \is_ssl();
+
+		if ( \defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70300 ) {
+			\setcookie(
+				self::NONCE_SEED_COOKIE,
+				$seed,
+				array(
+					'expires'  => $expires,
+					'path'     => '/',
+					'secure'   => $secure,
+					'httponly' => true,
+					'samesite' => 'Lax',
+				)
+			);
+		} else {
+			\setcookie( self::NONCE_SEED_COOKIE, $seed, $expires, '/; samesite=Lax', '', $secure, true );
+		}
+
+		$_COOKIE[ self::NONCE_SEED_COOKIE ] = $seed;
+	}
+
+	/**
+	 * Make nonces for logged-out visitors unique per browser (by deriving the nonce "UID"
+	 * from our nonce seed cookie) for this plugin's actions.
+	 *
+	 * @param mixed  $uid Current UID value.
+	 * @param mixed  $action Nonce action.
+	 * @return mixed
+	 */
+	public function filter_nonce_user_logged_out( $uid, $action ) {
+		$action = (string) $action;
+		if ( 0 !== \strpos( $action, 'ace_' ) ) {
+			return $uid;
+		}
+
+		if ( empty( $_COOKIE[ self::NONCE_SEED_COOKIE ] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+			return $uid;
+		}
+
+		$seed = \sanitize_text_field( (string) \wp_unslash( $_COOKIE[ self::NONCE_SEED_COOKIE ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+		if ( '' === $seed ) {
+			return $uid;
+		}
+
+		return \absint( \crc32( $seed ) );
 	}
 
 	/**

@@ -90,6 +90,7 @@
 			'payment_reference',
 			'total',
 			'currency',
+			'cancelled',
 		];
 
 		const lines = [];
@@ -127,6 +128,20 @@
 		return text.substring( 0, maxLength );
 	};
 
+	const isCancelledTicket = ( ticket ) => {
+		const cancelled = ticket?.cancelled;
+		if ( cancelled === true || cancelled === 1 ) {
+			return true;
+		}
+
+		const cancelledStr = String( cancelled || '' ).trim().toLowerCase();
+		if ( cancelledStr === '1' || cancelledStr === 'true' || cancelledStr === 'yes' ) {
+			return true;
+		}
+
+		return String( ticket?.cancelled_at || '' ).trim() !== '';
+	};
+
 	const buildPdf = ( tickets, filename ) => {
 		const JsPDF = getJsPDF();
 		if ( ! JsPDF ) {
@@ -159,6 +174,27 @@
 			const x = pos.x / ratio;
 			const y = pos.y / ratio;
 			doc.text( buildTicketText( ticket ), x, y );
+
+			if ( isCancelledTicket( ticket ) ) {
+				const indexOnPage = index % ticketsPerPage;
+				const columnsPerRow = 3;
+				const row = Math.floor( indexOnPage / columnsPerRow );
+				const col = indexOnPage % columnsPerRow;
+
+				const cellWidth = 850;
+				const cellHeight = 720;
+
+				const cellX = ( col * cellWidth ) / ratio;
+				const cellY = ( row * cellHeight ) / ratio;
+				const cellW = cellWidth / ratio;
+				const cellH = cellHeight / ratio;
+				const padding = 3;
+
+				doc.setDrawColor( 214, 54, 56 );
+				doc.setLineWidth( 0.8 );
+				doc.line( cellX + padding, cellY + padding, cellX + cellW - padding, cellY + cellH - padding );
+				doc.line( cellX + cellW - padding, cellY + padding, cellX + padding, cellY + cellH - padding );
+			}
 		} );
 
 		doc.save( filename );

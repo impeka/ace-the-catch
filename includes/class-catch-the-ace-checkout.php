@@ -64,6 +64,8 @@ class CatchTheAceCheckout {
 		if ( $geo['blocked'] ) {
 			return array(
 				'back_url'        => $back_url,
+				'sales_open'      => false,
+				'sales_message'   => '',
 				'geo_blocked'     => true,
 				'geo_message'     => $geo['message'],
 				'geo_needs_location' => (bool) ( $geo['needs_location'] ?? false ),
@@ -100,6 +102,42 @@ class CatchTheAceCheckout {
 				$request->handle();
 				exit;
 			}
+		}
+
+		$sales_status  = $this->get_sales_status( $post_id );
+		$sales_open    = (bool) ( $sales_status['open'] ?? false );
+		$sales_message = isset( $sales_status['message'] ) ? (string) $sales_status['message'] : \__( 'Ticket sales are currently closed.', 'ace-the-catch' );
+
+		// When ticket sales are closed, do not create orders from cart cookies (prevents bypassing client checks).
+		if ( ! $sales_open && 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+			return array(
+				'back_url'        => $back_url,
+				'sales_open'      => false,
+				'sales_message'   => $sales_message,
+				'geo_blocked'     => false,
+				'geo_message'     => '',
+				'geo_needs_location' => false,
+				'notice'          => $notice,
+				'cart_items'      => array(),
+				'warnings'        => array(),
+				'total_amount'    => 0.0,
+				'processor_label' => $this->get_processor_label(),
+				'processor_key'   => $this->get_processor_key(),
+				'stripe_pk'       => $this->get_stripe_publishable_key(),
+				'processor'       => $this->get_processor_instance(),
+				'processor_config'=> $this->get_processor_config(),
+				'currency'        => $currency,
+				'customer_first_name' => '',
+				'customer_last_name'  => '',
+				'customer_email'      => '',
+				'customer_phone'      => '',
+				'customer_location'   => '',
+				'benefactors'     => $benefactors,
+				'selected_benefactor' => 0,
+				'terms_url'       => $terms_url,
+				'rules_url'       => $rules_url,
+				'checkout_url'    => $checkout_url,
+			);
 		}
 
 		$orders = Plugin::instance()->get_orders();
@@ -171,6 +209,8 @@ class CatchTheAceCheckout {
 
 		return array(
 			'back_url'        => $back_url,
+			'sales_open'      => $sales_open,
+			'sales_message'   => $sales_message,
 			'geo_blocked'     => false,
 			'geo_message'     => '',
 			'geo_needs_location' => false,
@@ -194,6 +234,38 @@ class CatchTheAceCheckout {
 			'terms_url'       => $terms_url,
 			'rules_url'       => $rules_url,
 			'checkout_url'    => $checkout_url,
+		);
+	}
+
+	/**
+	 * Determine ticket sales status for a session.
+	 *
+	 * @param int $post_id Session post ID.
+	 * @return array{open:bool,message:string,close_epoch:int,open_epoch:int}
+	 */
+	public function get_sales_status( int $post_id ): array {
+		$default = array(
+			'open'        => false,
+			'message'     => \__( 'Ticket sales are currently closed.', 'ace-the-catch' ),
+			'close_epoch' => 0,
+			'open_epoch'  => 0,
+		);
+
+		$dealer = Plugin::instance()->get_envelope_dealer();
+		if ( ! ( $dealer instanceof EnvelopeDealer ) ) {
+			return $default;
+		}
+
+		$status = $dealer->get_sales_status( $post_id );
+		if ( ! \is_array( $status ) ) {
+			return $default;
+		}
+
+		return array(
+			'open'        => ! empty( $status['open'] ),
+			'message'     => isset( $status['message'] ) ? (string) $status['message'] : $default['message'],
+			'close_epoch' => isset( $status['close_epoch'] ) ? (int) $status['close_epoch'] : 0,
+			'open_epoch'  => isset( $status['open_epoch'] ) ? (int) $status['open_epoch'] : 0,
 		);
 	}
 
@@ -231,7 +303,7 @@ class CatchTheAceCheckout {
 		if ( false === $json ) {
 			return;
 		}
-		\setcookie( self::NOTICE_COOKIE, \rawurlencode( $json ), time() + 120, '/' );
+		$this->set_cookie( self::NOTICE_COOKIE, \rawurlencode( $json ), time() + 120, true );
 	}
 
 	/**
@@ -246,7 +318,7 @@ class CatchTheAceCheckout {
 
 		$json = \urldecode( (string) $_COOKIE[ self::NOTICE_COOKIE ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$data = \json_decode( $json, true );
-		\setcookie( self::NOTICE_COOKIE, '', time() - 3600, '/' );
+		$this->set_cookie( self::NOTICE_COOKIE, '', time() - 3600, true );
 
 		return \is_array( $data ) ? $data : array();
 	}
@@ -574,7 +646,7 @@ class CatchTheAceCheckout {
 		if ( false === $json ) {
 			return;
 		}
-		\setcookie( 'ace_checkout_cart', \rawurlencode( $json ), time() + 600, '/' );
+		$this->set_cookie( 'ace_checkout_cart', \rawurlencode( $json ), time() + 600, true );
 	}
 
 	/**
@@ -584,8 +656,43 @@ class CatchTheAceCheckout {
 	 */
 	public function clear_cart_cookies(): void {
 		Plugin::instance()->get_orders()->clear_order_cookie();
-		\setcookie( 'ace_checkout_cart', '', time() - 3600, '/' );
-		\setcookie( 'ace_cart_state', '', time() - 3600, '/' );
+		$this->set_cookie( 'ace_checkout_cart', '', time() - 3600, true );
+		$this->set_cookie( 'ace_cart_state', '', time() - 3600, false );
+	}
+
+	/**
+	 * Set a cookie with consistent security flags.
+	 *
+	 * @param string $name Cookie name.
+	 * @param string $value Cookie value.
+	 * @param int    $expires Unix timestamp.
+	 * @param bool   $http_only Whether to set HttpOnly.
+	 * @return void
+	 */
+	private function set_cookie( string $name, string $value, int $expires, bool $http_only ): void {
+		$secure = \is_ssl();
+
+		if ( \defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70300 ) {
+			\setcookie(
+				$name,
+				$value,
+				array(
+					'expires'  => $expires,
+					'path'     => '/',
+					'secure'   => $secure,
+					'httponly' => $http_only,
+					'samesite' => 'Lax',
+				)
+			);
+		} else {
+			\setcookie( $name, $value, $expires, '/; samesite=Lax', '', $secure, $http_only );
+		}
+
+		if ( '' === $value || time() > $expires ) {
+			unset( $_COOKIE[ $name ] );
+		} else {
+			$_COOKIE[ $name ] = $value;
+		}
 	}
 
 	/**

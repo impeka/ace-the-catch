@@ -82,6 +82,23 @@ class RequestPlaceOrder implements Request {
 			);
 		}
 
+		$sales = $this->checkout->get_sales_status( $this->post_id );
+		if ( empty( $sales['open'] ) ) {
+			$message = isset( $sales['message'] ) ? (string) $sales['message'] : \__( 'Ticket sales are currently closed.', 'ace-the-catch' );
+			return array(
+				'success'     => false,
+				'notice'      => array(
+					'type'    => 'error',
+					'message' => $message,
+				),
+				'cart_result' => array(
+					'cart_items'   => array(),
+					'warnings'     => array(),
+					'total_amount' => 0.0,
+				),
+			);
+		}
+
 		$raw_cart = isset( $_POST['envelope'] ) && \is_array( $_POST['envelope'] ) ? \wp_unslash( $_POST['envelope'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$raw_cart = $this->checkout->sanitize_raw_cart( $raw_cart );
 		$cart_result = $this->checkout->validate_cart( $this->post_id, $this->ticket_price, $raw_cart );

@@ -143,7 +143,7 @@ class OntarioBrowserGeoLocator implements GeoLocator {
 				)
 			);
 		} else {
-			\setcookie( self::COOKIE_NAME, $value, $expires, '/', '', \is_ssl(), false );
+			\setcookie( self::COOKIE_NAME, $value, $expires, '/; samesite=Lax', '', \is_ssl(), false );
 		}
 		$_COOKIE[ self::COOKIE_NAME ] = $value;
 	}

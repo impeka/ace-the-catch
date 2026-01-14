@@ -18,7 +18,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LOTTO_VERSION', '0.8.0' );
+define( 'LOTTO_VERSION', '1.0.0' );
 define( 'LOTTO_FILE', __FILE__ );
 define( 'LOTTO_PATH', \plugin_dir_path( __FILE__ ) );
 define( 'LOTTO_URL', \plugin_dir_url( __FILE__ ) );

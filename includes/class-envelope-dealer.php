@@ -149,6 +149,7 @@ class EnvelopeDealer {
 		$next_draw   = $this->get_next_draw_datetime( $post_id );
 
 		$checkout_url = \trailingslashit( $permalink . 'checkout' );
+		$checkout_nonce = \wp_create_nonce( 'ace_checkout_cart_' . (string) $post_id );
 
 		$cart_markup = '
 			<div class="ace-cart" id="ace-cart" hidden data-ticket-price="' . \esc_attr( $ticket_price ) . '">
@@ -217,7 +218,7 @@ class EnvelopeDealer {
 			$wrap_classes .= ' card-table-wrap--closed';
 		}
 
-		return '<div class="' . $wrap_classes . '" data-session-id="' . \esc_attr( $post_id ) . '" data-session-week="' . \esc_attr( $draws_count + 1 ) . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_popup ) . '" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
+		return '<div class="' . $wrap_classes . '" data-session-id="' . \esc_attr( $post_id ) . '" data-session-week="' . \esc_attr( $draws_count + 1 ) . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_popup ) . '" data-checkout-nonce="' . \esc_attr( $checkout_nonce ) . '" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
 	}
 
 	/**
@@ -341,7 +342,7 @@ class EnvelopeDealer {
 	 * @param int $post_id Session post ID.
 	 * @return array{open:bool,message:string,close_epoch:int,open_epoch:int}
 	 */
-	private function get_sales_status( int $post_id ): array {
+	public function get_sales_status( int $post_id ): array {
 		$default = array(
 			'open'        => false,
 			'message'     => \__( 'Ticket sales are currently closed.', 'ace-the-catch' ),

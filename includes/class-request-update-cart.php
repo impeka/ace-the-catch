@@ -19,6 +19,16 @@ class RequestUpdateCart implements Request {
 	private const CART_SUBMIT_FIELD = 'ace_checkout_cart';
 
 	/**
+	 * Nonce field name for cart submissions.
+	 */
+	private const CART_NONCE_FIELD = 'ace_checkout_cart_nonce';
+
+	/**
+	 * Nonce action prefix for cart submissions (suffix: session post ID).
+	 */
+	private const CART_NONCE_ACTION_PREFIX = 'ace_checkout_cart_';
+
+	/**
 	 * Legacy POST field name indicating cart submission from the card table.
 	 */
 	private const CART_SUBMIT_FIELD_LEGACY = 'ace_checkout';
@@ -63,6 +73,31 @@ class RequestUpdateCart implements Request {
 	}
 
 	public function handle(): void {
+		$nonce = isset( $_POST[ self::CART_NONCE_FIELD ] ) ? \sanitize_text_field( (string) \wp_unslash( $_POST[ self::CART_NONCE_FIELD ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( empty( $nonce ) || ! \wp_verify_nonce( $nonce, self::CART_NONCE_ACTION_PREFIX . (string) $this->post_id ) ) {
+			$this->checkout->persist_notice_cookie(
+				array(
+					'type'    => 'error',
+					'message' => \__( 'Security check failed. Please try again.', 'ace-the-catch' ),
+				)
+			);
+			\wp_safe_redirect( $this->checkout->get_checkout_url( $this->post_id ) );
+			exit;
+		}
+
+		$sales = $this->checkout->get_sales_status( $this->post_id );
+		if ( empty( $sales['open'] ) ) {
+			$message = isset( $sales['message'] ) ? (string) $sales['message'] : \__( 'Ticket sales are currently closed.', 'ace-the-catch' );
+			$this->checkout->persist_notice_cookie(
+				array(
+					'type'    => 'error',
+					'message' => $message,
+				)
+			);
+			\wp_safe_redirect( $this->checkout->get_checkout_url( $this->post_id ) );
+			exit;
+		}
+
 		$raw_cart = isset( $_POST['envelope'] ) && \is_array( $_POST['envelope'] ) ? \wp_unslash( $_POST['envelope'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$raw_cart = $this->checkout->sanitize_raw_cart( $raw_cart );
 

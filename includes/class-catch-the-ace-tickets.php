@@ -726,6 +726,7 @@ class CatchTheAceTickets {
 				t.ticket_id AS ticket_number,
 				t.envelope_number AS envelope_number,
 				t.created_at AS ticket_created_at,
+				t.cancelled_at AS cancelled_at,
 				p.ID AS order_id,
 				p.post_status AS order_status,
 				p.post_date AS order_created_at,
@@ -754,7 +755,7 @@ class CatchTheAceTickets {
 				{$cancelled_where}
 				AND t.created_at >= %s
 				AND t.created_at <= %s
-			GROUP BY t.ticket_id, t.envelope_number, t.created_at, p.ID, p.post_status, p.post_date
+			GROUP BY t.ticket_id, t.envelope_number, t.created_at, t.cancelled_at, p.ID, p.post_status, p.post_date
 			ORDER BY t.ticket_id ASC",
 			array_merge(
 				array(
@@ -781,10 +782,14 @@ class CatchTheAceTickets {
 				continue;
 			}
 
+			$cancelled_at = isset( $row['cancelled_at'] ) ? trim( (string) $row['cancelled_at'] ) : '';
+
 			$tickets[] = array(
 				'ticket_number'     => isset( $row['ticket_number'] ) ? (int) $row['ticket_number'] : 0,
 				'envelope_number'   => isset( $row['envelope_number'] ) ? (int) $row['envelope_number'] : 0,
 				'ticket_created_at' => isset( $row['ticket_created_at'] ) ? (string) $row['ticket_created_at'] : '',
+				'cancelled'         => ( '' !== $cancelled_at ) ? 'Yes' : 'No',
+				'cancelled_at'      => \sanitize_text_field( $cancelled_at ),
 				'order_id'          => isset( $row['order_id'] ) ? (int) $row['order_id'] : 0,
 				'order_number'      => isset( $row['order_number'] ) ? (int) $row['order_number'] : 0,
 				'order_status'      => isset( $row['order_status'] ) ? (string) $row['order_status'] : '',

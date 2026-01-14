@@ -1025,7 +1025,7 @@ class CatchTheAceOrders {
 		if ( false === $json ) {
 			return;
 		}
-		\setcookie( self::COOKIE_ORDER_STATE, \rawurlencode( $json ), time() + $ttl, '/' );
+		$this->set_cookie( self::COOKIE_ORDER_STATE, \rawurlencode( $json ), time() + $ttl, true );
 	}
 
 	/**
@@ -1034,7 +1034,42 @@ class CatchTheAceOrders {
 	 * @return void
 	 */
 	public function clear_order_cookie(): void {
-		\setcookie( self::COOKIE_ORDER_STATE, '', time() - 3600, '/' );
+		$this->set_cookie( self::COOKIE_ORDER_STATE, '', time() - 3600, true );
+	}
+
+	/**
+	 * Set a cookie with consistent security flags.
+	 *
+	 * @param string $name Cookie name.
+	 * @param string $value Cookie value.
+	 * @param int    $expires Unix timestamp.
+	 * @param bool   $http_only Whether to set HttpOnly.
+	 * @return void
+	 */
+	private function set_cookie( string $name, string $value, int $expires, bool $http_only ): void {
+		$secure = \is_ssl();
+
+		if ( \defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70300 ) {
+			\setcookie(
+				$name,
+				$value,
+				array(
+					'expires'  => $expires,
+					'path'     => '/',
+					'secure'   => $secure,
+					'httponly' => $http_only,
+					'samesite' => 'Lax',
+				)
+			);
+		} else {
+			\setcookie( $name, $value, $expires, '/; samesite=Lax', '', $secure, $http_only );
+		}
+
+		if ( '' === $value || time() > $expires ) {
+			unset( $_COOKIE[ $name ] );
+		} else {
+			$_COOKIE[ $name ] = $value;
+		}
 	}
 
 	/**

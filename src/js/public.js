@@ -19,6 +19,7 @@ const ace_the_catch = {
 	sessionId: null,
 	sessionWeek: null,
 	checkoutUrl: null,
+	checkoutNonce: null,
 	geoBlocked: false,
 	geoMessage: '',
 	geoNeedsLocation: false,
@@ -236,6 +237,7 @@ const ace_the_catch = {
 		this.sessionId = wrap?.dataset?.sessionId || null;
 		this.sessionWeek = wrap?.dataset?.sessionWeek || null;
 		this.checkoutUrl = wrap?.dataset?.checkoutUrl || null;
+		this.checkoutNonce = wrap?.dataset?.checkoutNonce || null;
 		const priceAttr = this.cartContainer?.getAttribute( 'data-ticket-price' );
 		const parsedPrice = parseFloat( priceAttr );
 		this.ticketPrice = Number.isFinite( parsedPrice ) ? parsedPrice : 0;
@@ -633,7 +635,8 @@ const ace_the_catch = {
 			const json = JSON.stringify( payload );
 			window.localStorage.setItem( 'ace_cart_state', json );
 			// Mirror to a cookie so checkout can be visited directly.
-			document.cookie = `ace_cart_state=${ encodeURIComponent( json ) };path=/;max-age=86400`;
+			const secure = window.location?.protocol === 'https:' ? ';Secure' : '';
+			document.cookie = `ace_cart_state=${ encodeURIComponent( json ) };path=/;max-age=86400;SameSite=Lax${ secure }`;
 		} catch ( err ) {
 			console.error( 'ACE: save_cart_to_storage failed', err );
 		}
@@ -680,6 +683,14 @@ const ace_the_catch = {
 		hiddenFlag.name = 'ace_checkout_cart';
 		hiddenFlag.value = '1';
 		form.appendChild( hiddenFlag );
+
+		if ( this.checkoutNonce ) {
+			const nonceField = document.createElement( 'input' );
+			nonceField.type = 'hidden';
+			nonceField.name = 'ace_checkout_cart_nonce';
+			nonceField.value = this.checkoutNonce;
+			form.appendChild( nonceField );
+		}
 
 		envelopes.forEach( ( env ) => {
 			const qty = this.cart[ env ]?.entries ?? 0;
