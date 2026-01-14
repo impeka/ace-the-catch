@@ -92,6 +92,7 @@ class CatchTheAceAcf {
 
 		$this->register_session_details_group();
 		$this->register_draw_details_group();
+		$this->register_card_table_navigation_group();
 		$this->register_winning_draws_group();
 	}
 
@@ -228,6 +229,55 @@ class CatchTheAceAcf {
 								'return_format' => 'H:i',
 							),
 						),
+					),
+				),
+				'location' => array(
+					array(
+						array(
+							'param'    => 'post_type',
+							'operator' => '==',
+							'value'    => 'catch-the-ace',
+						),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Card table navigation (actions above the table).
+	 */
+	private function register_card_table_navigation_group(): void {
+		\acf_add_local_field_group(
+			array(
+				'key'      => 'group_catch_card_table_navigation',
+				'title'    => \__( 'Card Table Navigation', 'ace-the-catch' ),
+				'fields'   => array(
+					array(
+						'key'          => 'field_card_table_navigation_links',
+						'label'        => \__( 'Navigation Links', 'ace-the-catch' ),
+						'name'         => 'card_table_navigation_links',
+						'type'         => 'repeater',
+						'layout'       => 'row',
+						'button_label' => \__( 'Add Link', 'ace-the-catch' ),
+						'sub_fields'   => array(
+							array(
+								'key'          => 'field_card_table_navigation_link',
+								'label'        => \__( 'Link', 'ace-the-catch' ),
+								'name'         => 'link',
+								'type'         => 'link',
+								'return_format'=> 'array',
+							),
+						),
+						'instructions' => \__( 'These links will appear above the card table. The Past Draws link is added automatically unless hidden below.', 'ace-the-catch' ),
+					),
+					array(
+						'key'           => 'field_hide_past_draws_link',
+						'label'         => \__( 'Hide Past Draws link', 'ace-the-catch' ),
+						'name'          => 'hide_past_draws_link',
+						'type'          => 'true_false',
+						'ui'            => 1,
+						'default_value' => 0,
 					),
 				),
 				'location' => array(

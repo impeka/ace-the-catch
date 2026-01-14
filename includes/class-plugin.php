@@ -52,6 +52,13 @@ final class Plugin {
 	private EnvelopeDealer $envelope_dealer;
 
 	/**
+	 * Session-level shortcodes handler.
+	 *
+	 * @var CatchTheAceSessionShortcodes
+	 */
+	private CatchTheAceSessionShortcodes $catch_the_ace_session_shortcodes;
+
+	/**
 	 * Catch the Ace custom post type.
 	 *
 	 * @var CatchTheAceCpt
@@ -132,6 +139,7 @@ final class Plugin {
 		$this->geo_locator_factory       = new GeoLocatorFactory();
 		$this->register_builtin_locators();
 		$this->envelope_dealer           = new EnvelopeDealer();
+		$this->catch_the_ace_session_shortcodes = new CatchTheAceSessionShortcodes();
 		$this->catch_the_ace_cpt         = new CatchTheAceCpt();
 		$this->catch_the_ace_acf         = new CatchTheAceAcf();
 		$this->catch_the_ace_settings    = new CatchTheAceSettings();
@@ -370,6 +378,17 @@ final class Plugin {
 		$admin_message   = \get_option( CatchTheAceSettings::OPTION_OUTSIDE_MESSAGE, '' );
 		$message_html    = $admin_message ? \wp_kses_post( $admin_message ) : $default_message;
 
+		if ( ! $in_ontario ) {
+			$message_html .= $this->render_geo_details_table(
+				array(
+					\__( 'Geo provider', 'ace-the-catch' ) => $locator->get_label(),
+					\__( 'Lookup method', 'ace-the-catch' ) => \__( 'Browser location', 'ace-the-catch' ),
+					\__( 'Coordinates', 'ace-the-catch' ) => \number_format( $lat, 6, '.', '' ) . ', ' . \number_format( $lng, 6, '.', '' ),
+					\__( 'Within Ontario', 'ace-the-catch' ) => \__( 'No', 'ace-the-catch' ),
+				)
+			);
+		}
+
 		\wp_send_json_success(
 			array(
 				'in_ontario' => $in_ontario,
@@ -379,12 +398,38 @@ final class Plugin {
 	}
 
 	/**
+	 * Render a table of geo lookup details for blocked users.
+	 *
+	 * @param array<string,string> $rows Label => value pairs.
+	 * @return string
+	 */
+	private function render_geo_details_table( array $rows ): string {
+		if ( empty( $rows ) ) {
+			return '';
+		}
+
+		$html = '<div class="ace-geo-details-wrap"><table class="ace-geo-details"><tbody>';
+		foreach ( $rows as $label => $value ) {
+			$label = \trim( (string) $label );
+			$value = \trim( (string) $value );
+			if ( '' === $label || '' === $value ) {
+				continue;
+			}
+			$html .= '<tr><th>' . \esc_html( $label ) . '</th><td>' . \esc_html( $value ) . '</td></tr>';
+		}
+		$html .= '</tbody></table></div>';
+
+		return $html;
+	}
+
+	/**
 	 * Register shortcodes.
 	 *
 	 * @return void
 	 */
 	public function register_shortcodes(): void {
 		$this->envelope_dealer->register();
+		$this->catch_the_ace_session_shortcodes->register();
 	}
 
 	/**

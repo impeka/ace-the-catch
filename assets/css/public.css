@@ -143,3 +143,171 @@
 	align-items: center;
 	margin-top: 6px;
 }
+
+/* Countdown shortcode styling (match card table header) */
+.ace-countdown .simply-countdown {
+	overflow: hidden;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	gap: 0.4rem;
+	font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.ace-countdown .simply-countdown > .simply-section {
+	width: 46px;
+	height: 46px;
+	padding: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid rgba(226, 232, 240, 0.8);
+	border-radius: 0.85rem;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	backdrop-filter: blur(10px);
+}
+
+.ace-countdown .simply-countdown > .simply-section > div {
+	display: flex;
+	flex-direction: column;
+	line-height: 1;
+	align-items: center;
+}
+
+.ace-countdown .simply-countdown .simply-amount {
+	font-size: 1rem;
+	font-weight: 700;
+	color: #1e293b;
+	line-height: 1.2;
+	letter-spacing: -0.025em;
+}
+
+.ace-countdown .simply-countdown .simply-word {
+	font-size: 0.5rem;
+	font-weight: 600;
+	color: #64748b;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+@media (min-width: 640px) {
+	.ace-countdown .simply-countdown > .simply-section {
+		width: 54px;
+		height: 54px;
+		padding: 0.9rem;
+	}
+
+	.ace-countdown .simply-countdown .simply-amount {
+		font-size: 1.1rem;
+	}
+
+	.ace-countdown .simply-countdown .simply-word {
+		font-size: 0.55rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.ace-countdown .simply-countdown > .simply-section {
+		width: 58px;
+		height: 58px;
+		padding: 1rem;
+	}
+
+	.ace-countdown .simply-countdown .simply-amount {
+		font-size: 1.2rem;
+	}
+
+	.ace-countdown .simply-countdown .simply-word {
+		font-size: 0.6rem;
+	}
+}
+
+/* Mini cards shortcode */
+.cta-mini-cards {
+	margin: 0 auto;
+}
+
+.cta-mini-cards .cta-mini-cards__table {
+	grid-template-areas: none;
+	grid-auto-rows: auto;
+	gap: 5px;
+}
+
+.cta-mini-cards .envelope {
+	pointer-events: none;
+	cursor: default;
+}
+
+.cta-mini-cards .envelope:hover {
+	box-shadow: none;
+	scale: 1;
+	cursor: default;
+}
+
+.cta-mini-cards .envelope .__card,
+.cta-mini-cards .envelope .__front,
+.cta-mini-cards .envelope .__back {
+	border-radius: 8px;
+}
+
+.cta-mini-cards .envelope .__card {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.cta-mini-cards .envelope .__back::after {
+	font-size: clamp(0.1rem, 2.2vw, 1rem);
+	text-shadow: 0 2px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Geo block details table (SweetAlert2) */
+.swal2-popup .ace-geo-details-wrap {
+	margin-top: 12px;
+}
+
+.swal2-popup .ace-geo-details {
+	width: 100%;
+	max-width: 520px;
+	margin: 0 auto;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.swal2-popup .ace-geo-details th,
+.swal2-popup .ace-geo-details td {
+	padding: 6px 8px;
+	border: 1px solid rgba(15, 23, 42, 0.12);
+	vertical-align: top;
+}
+
+.swal2-popup .ace-geo-details th {
+	width: 42%;
+	text-align: left;
+	background: #f8fafc;
+	color: #0f172a;
+	font-weight: 600;
+}
+
+.swal2-popup .ace-geo-details td {
+	text-align: left;
+	color: #334155;
+	word-break: break-word;
+}
+
+/* Card table navigation buttons */
+.card-table-actions {
+	flex-wrap: wrap;
+}
+
+.card-table-actions .card-table-header__btn {
+	min-width: 125px;
+	width: auto;
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+/* Add space between the card table and the cart */
+.card-table-wrap .ace-cart {
+	margin-top: 72px;
+}

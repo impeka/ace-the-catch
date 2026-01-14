@@ -1,0 +1,1436 @@
+# Copyright (C) 2026 Impeka
+# This file is distributed under the same license as the Ace the Catch plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Ace the Catch 0.8.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ace-the-catch\n"
+"POT-Creation-Date: 2026-01-14T02:19:18+00:00\n"
+"PO-Revision-Date: 2026-01-13 21:51-0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: ace-the-catch\n"
+"X-Generator: Poedit 3.8\n"
+
+#. Plugin Name of the plugin
+#: C:\impeka\websites\rsm\wp-content\plugins\ace-the-catch\ace-the-catch.php
+msgid "Ace the Catch"
+msgstr "Ace the Catch"
+
+#. Plugin URI of the plugin
+#: C:\impeka\websites\rsm\wp-content\plugins\ace-the-catch\ace-the-catch.php
+msgid "https://example.com"
+msgstr "https://example.com"
+
+#. Description of the plugin
+#: C:\impeka\websites\rsm\wp-content\plugins\ace-the-catch\ace-the-catch.php
+msgid "Core scaffolding for the Ace the Catch plugin."
+msgstr "Structure de base pour l’extension Ace the Catch."
+
+#. Author of the plugin
+#: C:\impeka\websites\rsm\wp-content\plugins\ace-the-catch\ace-the-catch.php
+msgid "Impeka"
+msgstr "Impeka"
+
+#. Author URI of the plugin
+#: C:\impeka\websites\rsm\wp-content\plugins\ace-the-catch\ace-the-catch.php
+msgid "https://impeka.com"
+msgstr "https://impeka.com"
+
+#: includes/class-catch-the-ace-acf.php:106
+msgid "Session Details"
+msgstr "Détails de la session"
+
+#: includes/class-catch-the-ace-acf.php:110
+msgid "Session Start"
+msgstr "Début de la session"
+
+#: includes/class-catch-the-ace-acf.php:119
+msgid "Session Ended"
+msgstr "Session terminée"
+
+#: includes/class-catch-the-ace-acf.php:144
+msgid "Sunday"
+msgstr "Dimanche"
+
+#: includes/class-catch-the-ace-acf.php:145
+msgid "Monday"
+msgstr "Lundi"
+
+#: includes/class-catch-the-ace-acf.php:146
+msgid "Tuesday"
+msgstr "Mardi"
+
+#: includes/class-catch-the-ace-acf.php:147
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: includes/class-catch-the-ace-acf.php:148
+msgid "Thursday"
+msgstr "Jeudi"
+
+#: includes/class-catch-the-ace-acf.php:149
+msgid "Friday"
+msgstr "Vendredi"
+
+#: includes/class-catch-the-ace-acf.php:150
+msgid "Saturday"
+msgstr "Samedi"
+
+#: includes/class-catch-the-ace-acf.php:156
+msgid "Draw Details"
+msgstr "Détails du tirage"
+
+#: includes/class-catch-the-ace-acf.php:160
+msgid "Ticket Sales Open On"
+msgstr "Ouverture de la vente de billets"
+
+#: includes/class-catch-the-ace-acf.php:167
+#: includes/class-catch-the-ace-acf.php:192
+#: includes/class-catch-the-ace-acf.php:217
+msgid "Day of Week"
+msgstr "Jour de la semaine"
+
+#: includes/class-catch-the-ace-acf.php:175
+#: includes/class-catch-the-ace-acf.php:200
+#: includes/class-catch-the-ace-acf.php:225
+msgid "Time"
+msgstr "Heure"
+
+#: includes/class-catch-the-ace-acf.php:185
+msgid "Ticket Sales End On"
+msgstr "Fin de la vente de billets"
+
+#: includes/class-catch-the-ace-acf.php:210
+msgid "Weekly Draw Occurs On"
+msgstr "Le tirage hebdomadaire a lieu le"
+
+#: includes/class-catch-the-ace-acf.php:254
+msgid "Card Table Navigation"
+msgstr "Navigation de la table de cartes"
+
+#: includes/class-catch-the-ace-acf.php:258
+msgid "Navigation Links"
+msgstr "Liens de navigation"
+
+#: includes/class-catch-the-ace-acf.php:262
+msgid "Add Link"
+msgstr "Ajouter un lien"
+
+#: includes/class-catch-the-ace-acf.php:266
+msgid "Link"
+msgstr "Lien"
+
+#: includes/class-catch-the-ace-acf.php:272
+msgid ""
+"These links will appear above the card table. The Past Draws link is added "
+"automatically unless hidden below."
+msgstr ""
+"Ces liens apparaîtront au-dessus de la table de cartes. Le lien « Tirages "
+"précédents » est ajouté automatiquement, sauf s’il est masqué ci-dessous."
+
+#: includes/class-catch-the-ace-acf.php:276
+msgid "Hide Past Draws link"
+msgstr "Masquer le lien « Tirages précédents »"
+
+#: includes/class-catch-the-ace-acf.php:308
+#: includes/class-catch-the-ace-acf.php:312
+msgid "Winning Draws"
+msgstr "Tirages gagnants"
+
+#: includes/class-catch-the-ace-acf.php:316
+msgid "Add Draw"
+msgstr "Ajouter un tirage"
+
+#: includes/class-catch-the-ace-acf.php:320
+msgid "Draw Date"
+msgstr "Date du tirage"
+
+#: includes/class-catch-the-ace-acf.php:328
+msgid "Selected Envelope"
+msgstr "Enveloppe sélectionnée"
+
+#: includes/class-catch-the-ace-acf.php:337
+msgid "Card Within"
+msgstr "Carte à l’intérieur"
+
+#: includes/class-catch-the-ace-acf.php:346
+msgid "Winnings"
+msgstr "Gains"
+
+#: includes/class-catch-the-ace-acf.php:354
+msgid "Winning Note"
+msgstr "Note du tirage gagnant"
+
+#: includes/class-catch-the-ace-benefactors.php:29
+#: includes/class-catch-the-ace-benefactors.php:37
+msgid "Benefactors"
+msgstr "Bénéficiaires"
+
+#: includes/class-catch-the-ace-benefactors.php:30
+#: includes/class-catch-the-ace-orders.php:1304
+#: templates/single-catch-the-ace__checkout.php:152
+msgid "Benefactor"
+msgstr "Bénéficiaire"
+
+#: includes/class-catch-the-ace-benefactors.php:31
+msgid "Search Benefactors"
+msgstr "Rechercher des bénéficiaires"
+
+#: includes/class-catch-the-ace-benefactors.php:32
+msgid "All Benefactors"
+msgstr "Tous les bénéficiaires"
+
+#: includes/class-catch-the-ace-benefactors.php:33
+msgid "Edit Benefactor"
+msgstr "Modifier le bénéficiaire"
+
+#: includes/class-catch-the-ace-benefactors.php:34
+msgid "Update Benefactor"
+msgstr "Mettre à jour le bénéficiaire"
+
+#: includes/class-catch-the-ace-benefactors.php:35
+msgid "Add New Benefactor"
+msgstr "Ajouter un nouveau bénéficiaire"
+
+#: includes/class-catch-the-ace-benefactors.php:36
+msgid "New Benefactor Name"
+msgstr "Nom du nouveau bénéficiaire"
+
+#: includes/class-catch-the-ace-checkout.php:257
+#: includes/class-envelope-dealer.php:536 includes/class-plugin.php:377
+msgid "Ticket sales are not available in your region."
+msgstr "La vente de billets n’est pas disponible dans votre région."
+
+#: includes/class-catch-the-ace-checkout.php:615
+msgid "Envelope #%d was removed because it is no longer available."
+msgstr "L’enveloppe nº%d a été supprimée car elle n’est plus disponible."
+
+#: includes/class-catch-the-ace-cpt.php:32
+msgid "Sessions"
+msgstr "Sessions"
+
+#: includes/class-catch-the-ace-cpt.php:33
+#: includes/class-catch-the-ace-cpt.php:35
+#: includes/class-catch-the-ace-orders.php:1288
+#: templates/archive-catch-the-ace.php:35
+msgid "Session"
+msgstr "Session"
+
+#: includes/class-catch-the-ace-cpt.php:34
+msgid "Catch the Ace"
+msgstr "Attrape l’As"
+
+#: includes/class-catch-the-ace-cpt.php:36
+#: includes/class-catch-the-ace-cpt.php:37
+msgid "Add New Session"
+msgstr "Ajouter une nouvelle session"
+
+#: includes/class-catch-the-ace-cpt.php:38
+msgid "New Session"
+msgstr "Nouvelle session"
+
+#: includes/class-catch-the-ace-cpt.php:39
+msgid "Edit Session"
+msgstr "Modifier la session"
+
+#: includes/class-catch-the-ace-cpt.php:40
+msgid "View Session"
+msgstr "Voir la session"
+
+#: includes/class-catch-the-ace-cpt.php:41
+msgid "All Sessions"
+msgstr "Toutes les sessions"
+
+#: includes/class-catch-the-ace-cpt.php:42
+msgid "Search Sessions"
+msgstr "Rechercher des sessions"
+
+#: includes/class-catch-the-ace-cpt.php:43
+#: templates/archive-catch-the-ace.php:45
+msgid "No sessions found."
+msgstr "Aucune session trouvée."
+
+#: includes/class-catch-the-ace-cpt.php:44
+msgid "No sessions found in Trash."
+msgstr "Aucune session trouvée dans la corbeille."
+
+#: includes/class-catch-the-ace-emails.php:36
+msgid "Transaction email not sent: customer email is missing."
+msgstr ""
+"Courriel de transaction non envoyé : l’adresse courriel du client est "
+"manquante."
+
+#: includes/class-catch-the-ace-emails.php:47
+msgid "Order #%d confirmed"
+msgstr "Commande nº%d confirmée"
+
+#: includes/class-catch-the-ace-emails.php:48
+msgid "Order confirmed"
+msgstr "Commande confirmée"
+
+#: includes/class-catch-the-ace-emails.php:53
+msgid "Thank you for your purchase!"
+msgstr "Merci pour votre achat !"
+
+#: includes/class-catch-the-ace-emails.php:78
+msgid "Transaction email sent to %s."
+msgstr "Courriel de transaction envoyé à %s."
+
+#: includes/class-catch-the-ace-emails.php:79
+msgid "Transaction email failed to send to %s."
+msgstr "Échec de l’envoi du courriel de transaction à %s."
+
+#: includes/class-catch-the-ace-emails.php:95
+msgid "Ticket email not sent: customer email is missing."
+msgstr ""
+"Courriel des billets non envoyé : l’adresse courriel du client est "
+"manquante."
+
+#: includes/class-catch-the-ace-emails.php:102
+msgid "Your tickets for Order #%d"
+msgstr "Vos billets pour la commande nº%d"
+
+#: includes/class-catch-the-ace-emails.php:103
+msgid "Your tickets"
+msgstr "Vos billets"
+
+#: includes/class-catch-the-ace-emails.php:108
+msgid "Your tickets are ready."
+msgstr "Vos billets sont prêts."
+
+#: includes/class-catch-the-ace-emails.php:113
+msgid "Ticket email not sent: no tickets found for this order."
+msgstr ""
+"Courriel des billets non envoyé : aucun billet trouvé pour cette commande."
+
+#: includes/class-catch-the-ace-emails.php:135
+msgid "Ticket delivery email sent to %s."
+msgstr "Courriel d’envoi des billets envoyé à %s."
+
+#: includes/class-catch-the-ace-emails.php:136
+msgid "Ticket delivery email failed to send to %s."
+msgstr "Échec de l’envoi du courriel d’envoi des billets à %s."
+
+#: includes/class-catch-the-ace-emails.php:170
+#: includes/class-catch-the-ace-logs.php:200
+msgid "Order #%d"
+msgstr "Commande nº%d"
+
+#: includes/class-catch-the-ace-emails.php:174
+msgid "Payment Reference:"
+msgstr "Référence de paiement :"
+
+#: includes/class-catch-the-ace-emails.php:177
+msgid "You will receive your tickets in a separate email."
+msgstr "Vous recevrez vos billets dans un courriel séparé."
+
+#: includes/class-catch-the-ace-emails.php:200
+#: includes/class-catch-the-ace-emails.php:273
+#: includes/class-catch-the-ace-orders.php:1334
+#: includes/class-catch-the-ace-tickets.php:483
+#: includes/class-envelope-dealer.php:159
+#: templates/single-catch-the-ace__checkout.php:95
+msgid "Envelope"
+msgstr "Enveloppe"
+
+#: includes/class-catch-the-ace-emails.php:201
+#: includes/class-envelope-dealer.php:160
+#: templates/single-catch-the-ace__checkout.php:96
+msgid "Entries"
+msgstr "Participations"
+
+#: includes/class-catch-the-ace-emails.php:202
+#: includes/class-envelope-dealer.php:161
+#: templates/single-catch-the-ace__checkout.php:97
+msgid "Subtotal"
+msgstr "Sous-total"
+
+#: includes/class-catch-the-ace-emails.php:223
+#: includes/class-catch-the-ace-orders.php:1321
+#: includes/class-catch-the-ace-orders.php:1386
+#: includes/class-envelope-dealer.php:168
+#: templates/single-catch-the-ace__checkout.php:111
+msgid "Total"
+msgstr "Total"
+
+#: includes/class-catch-the-ace-emails.php:265
+msgid "Tickets for Order #%d"
+msgstr "Billets pour la commande nº%d"
+
+#: includes/class-catch-the-ace-emails.php:267
+msgid "Your Tickets"
+msgstr "Vos billets"
+
+#: includes/class-catch-the-ace-emails.php:272
+#: includes/class-catch-the-ace-tickets.php:483
+msgid "Ticket #"
+msgstr "Billet nº"
+
+#: includes/class-catch-the-ace-logs.php:33
+#: includes/class-catch-the-ace-logs.php:57
+msgid "Catch the Ace Logs"
+msgstr "Journaux de Catch the Ace"
+
+#: includes/class-catch-the-ace-logs.php:34
+msgid "Logs"
+msgstr "Journaux"
+
+#: includes/class-catch-the-ace-logs.php:85
+msgid "Queue Status"
+msgstr "État de la file"
+
+#: includes/class-catch-the-ace-logs.php:86
+msgid "Error Logs"
+msgstr "Journaux d’erreurs"
+
+#: includes/class-catch-the-ace-logs.php:114
+msgid "Ticket Generation"
+msgstr "Génération des billets"
+
+#: includes/class-catch-the-ace-logs.php:118
+msgid "Pending Orders"
+msgstr "Commandes en attente"
+
+#: includes/class-catch-the-ace-logs.php:122
+msgid "Orders In Process"
+msgstr "Commandes en cours"
+
+#: includes/class-catch-the-ace-logs.php:126
+msgid "Generated Orders"
+msgstr "Commandes générées"
+
+#: includes/class-catch-the-ace-logs.php:130
+msgid "Last Run"
+msgstr "Dernière exécution"
+
+#: includes/class-catch-the-ace-logs.php:131
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: includes/class-catch-the-ace-logs.php:134
+msgid "Next Scheduled Run"
+msgstr "Prochaine exécution planifiée"
+
+#: includes/class-catch-the-ace-logs.php:140
+msgid "Not scheduled"
+msgstr "Non planifié"
+
+#: includes/class-catch-the-ace-logs.php:169
+msgid "Recent MySQL and email delivery errors recorded by Catch the Ace."
+msgstr ""
+"Erreurs récentes de MySQL et de livraison de courriels enregistrées par "
+"Catch the Ace."
+
+#: includes/class-catch-the-ace-logs.php:172
+msgid "No error logs found."
+msgstr "Aucun journal d’erreurs trouvé."
+
+#: includes/class-catch-the-ace-logs.php:178
+#: includes/class-catch-the-ace-orders.php:1387
+msgid "Date"
+msgstr "Date"
+
+#: includes/class-catch-the-ace-logs.php:179
+msgid "Type"
+msgstr "Type"
+
+#: includes/class-catch-the-ace-logs.php:180
+msgid "Source"
+msgstr "Source"
+
+#: includes/class-catch-the-ace-logs.php:181
+#: includes/class-catch-the-ace-orders.php:157
+#: includes/class-catch-the-ace-orders.php:159
+#: includes/class-catch-the-ace-orders.php:532
+msgid "Order"
+msgstr "Commande"
+
+#: includes/class-catch-the-ace-logs.php:182
+msgid "Message"
+msgstr "Message"
+
+#: includes/class-catch-the-ace-logs.php:200
+msgid "Order (%d)"
+msgstr "Commande (%d)"
+
+#: includes/class-catch-the-ace-logs.php:213
+msgid "Context"
+msgstr "Contexte"
+
+#: includes/class-catch-the-ace-logs.php:242
+msgid "&laquo; Previous"
+msgstr "&laquo; Précédent"
+
+#: includes/class-catch-the-ace-logs.php:243
+msgid "Next &raquo;"
+msgstr "Suivant &raquo;"
+
+#: includes/class-catch-the-ace-orders.php:156
+#: includes/class-catch-the-ace-orders.php:158
+msgid "Orders"
+msgstr "Commandes"
+
+#: includes/class-catch-the-ace-orders.php:160
+#: includes/class-catch-the-ace-orders.php:161
+msgid "Add Order"
+msgstr "Ajouter une commande"
+
+#: includes/class-catch-the-ace-orders.php:162
+msgid "Edit Order"
+msgstr "Modifier la commande"
+
+#: includes/class-catch-the-ace-orders.php:163
+msgid "New Order"
+msgstr "Nouvelle commande"
+
+#: includes/class-catch-the-ace-orders.php:164
+msgid "View Order"
+msgstr "Voir la commande"
+
+#: includes/class-catch-the-ace-orders.php:165
+msgid "Search Orders"
+msgstr "Rechercher des commandes"
+
+#: includes/class-catch-the-ace-orders.php:166
+msgid "No orders found."
+msgstr "Aucune commande trouvée."
+
+#: includes/class-catch-the-ace-orders.php:167
+msgid "No orders found in Trash."
+msgstr "Aucune commande trouvée dans la corbeille."
+
+#: includes/class-catch-the-ace-orders.php:168
+msgid "All Orders"
+msgstr "Toutes les commandes"
+
+#: includes/class-catch-the-ace-orders.php:513
+#: includes/class-catch-the-ace-orders.php:987
+msgid "Order marked as abandoned due to inactivity."
+msgstr "Commande marquée comme abandonnée en raison d’inactivité."
+
+#: includes/class-catch-the-ace-orders.php:573
+msgid "Order started."
+msgstr "Commande démarrée."
+
+#: includes/class-catch-the-ace-orders.php:819
+msgid "Catch the Ace order #%d"
+msgstr "Commande Catch the Ace nº%d"
+
+#: includes/class-catch-the-ace-orders.php:820
+msgid "Catch the Ace order"
+msgstr "Commande Catch the Ace"
+
+#: includes/class-catch-the-ace-orders.php:852
+msgid "Payment sync failed: %s"
+msgstr "Échec de synchronisation du paiement : %s"
+
+#. translators: 1: full name, 2: email
+#: includes/class-catch-the-ace-orders.php:877
+msgid "Customer set: %1$s <%2$s>."
+msgstr "Client défini : %1$s <%2$s>."
+
+#: includes/class-catch-the-ace-orders.php:1195
+msgid "Removed Envelope #%d (qty %d)."
+msgstr "Enveloppe nº%d supprimée (qté %d)."
+
+#: includes/class-catch-the-ace-orders.php:1200
+msgid "Added Envelope #%d (qty %d)."
+msgstr "Enveloppe nº%d ajoutée (qté %d)."
+
+#. translators: 1: envelope number, 2: old qty, 3: new qty
+#: includes/class-catch-the-ace-orders.php:1209
+msgid "Updated Envelope #%1$d quantity from %2$d to %3$d."
+msgstr "Quantité de l’enveloppe nº%1$d mise à jour de %2$d à %3$d."
+
+#: includes/class-catch-the-ace-orders.php:1218
+msgid "Cart updated (no changes detected)."
+msgstr "Panier mis à jour (aucun changement détecté)."
+
+#: includes/class-catch-the-ace-orders.php:1231
+msgid "Started"
+msgstr "Démarrée"
+
+#: includes/class-catch-the-ace-orders.php:1232
+#: includes/class-catch-the-ace-orders.php:1583
+#: includes/class-catch-the-ace-tickets.php:183
+msgid "In process"
+msgstr "En cours"
+
+#: includes/class-catch-the-ace-orders.php:1233
+msgid "Failed"
+msgstr "Échouée"
+
+#: includes/class-catch-the-ace-orders.php:1234
+msgid "Completed"
+msgstr "Terminée"
+
+#: includes/class-catch-the-ace-orders.php:1235
+msgid "Abandoned"
+msgstr "Abandonnée"
+
+#: includes/class-catch-the-ace-orders.php:1236
+msgid "Refunded / Cancelled"
+msgstr "Remboursée / annulée"
+
+#: includes/class-catch-the-ace-orders.php:1248
+msgid "Order Details"
+msgstr "Détails de la commande"
+
+#: includes/class-catch-the-ace-orders.php:1286
+msgid "Order Number"
+msgstr "Numéro de commande"
+
+#: includes/class-catch-the-ace-orders.php:1287
+#: includes/class-catch-the-ace-orders.php:1385
+msgid "Status"
+msgstr "État"
+
+#: includes/class-catch-the-ace-orders.php:1301
+msgid "Customer"
+msgstr "Client"
+
+#: includes/class-catch-the-ace-orders.php:1302
+#: templates/single-catch-the-ace__checkout.php:141
+msgid "Telephone"
+msgstr "Téléphone"
+
+#: includes/class-catch-the-ace-orders.php:1303
+msgid "Location"
+msgstr "Localisation"
+
+#: includes/class-catch-the-ace-orders.php:1308
+msgid "All charities"
+msgstr "Tous les organismes de bienfaisance"
+
+#: includes/class-catch-the-ace-orders.php:1311
+msgid "Terms Accepted"
+msgstr "Modalités acceptées"
+
+#: includes/class-catch-the-ace-orders.php:1315
+msgid "View terms"
+msgstr "Voir les modalités"
+
+#: includes/class-catch-the-ace-orders.php:1322
+msgid "Payment Reference"
+msgstr "Référence de paiement"
+
+#: includes/class-catch-the-ace-orders.php:1323
+msgid "Ticket Status"
+msgstr "État des billets"
+
+#: includes/class-catch-the-ace-orders.php:1327
+msgid "Order Contents"
+msgstr "Contenu de la commande"
+
+#: includes/class-catch-the-ace-orders.php:1330
+msgid "No items in this order."
+msgstr "Aucun article dans cette commande."
+
+#: includes/class-catch-the-ace-orders.php:1334
+msgid "Quantity"
+msgstr "Quantité"
+
+#: includes/class-catch-the-ace-orders.php:1348
+msgid "Log"
+msgstr "Journal"
+
+#: includes/class-catch-the-ace-orders.php:1351
+msgid "No log entries yet."
+msgstr "Aucune entrée dans le journal pour l’instant."
+
+#: includes/class-catch-the-ace-orders.php:1383
+msgid "Order #"
+msgstr "Commande nº"
+
+#: includes/class-catch-the-ace-orders.php:1384
+msgid "Title"
+msgstr "Titre"
+
+#: includes/class-catch-the-ace-orders.php:1581
+#: includes/class-catch-the-ace-orders.php:1585
+#: includes/class-catch-the-ace-tickets.php:181
+#: includes/class-catch-the-ace-tickets.php:472
+msgid "Not generated"
+msgstr "Non généré"
+
+#: includes/class-catch-the-ace-orders.php:1582
+#: includes/class-catch-the-ace-tickets.php:182
+msgid "Generate"
+msgstr "À générer"
+
+#: includes/class-catch-the-ace-orders.php:1584
+#: includes/class-catch-the-ace-tickets.php:184
+msgid "Generated"
+msgstr "Généré"
+
+#: includes/class-catch-the-ace-session-shortcodes.php:43
+msgid "Session Shortcodes"
+msgstr "Codes courts de session"
+
+#: includes/class-catch-the-ace-session-shortcodes.php:70
+msgid ""
+"Use these shortcodes to embed session components elsewhere (pages, posts, "
+"widgets)."
+msgstr ""
+"Utilisez ces codes courts pour intégrer des composantes de session ailleurs "
+"(pages, articles, widgets)."
+
+#: includes/class-catch-the-ace-session-shortcodes.php:75
+#: includes/class-catch-the-ace-session-shortcodes.php:77
+msgid "Copy shortcode"
+msgstr "Copier le code court"
+
+#: includes/class-catch-the-ace-session-shortcodes.php:82
+msgid ""
+"For cta_mini_cards, use max_width to control overall size and columns to "
+"control cards per row."
+msgstr ""
+"Pour cta_mini_cards, utilisez max_width pour contrôler la taille globale et "
+"columns pour contrôler le nombre de cartes par rangée."
+
+#: includes/class-catch-the-ace-session-shortcodes.php:114
+#: includes/class-envelope-dealer.php:181
+#: templates/single-catch-the-ace__winners.php:37
+msgid "Next draw in:"
+msgstr "Prochain tirage dans :"
+
+#: includes/class-catch-the-ace-session-shortcodes.php:151
+msgid "Ticket sales close in:"
+msgstr "La vente de billets se termine dans :"
+
+#: includes/class-catch-the-ace-settings.php:49
+#: includes/class-catch-the-ace-settings.php:246
+#: includes/class-catch-the-ace-tickets.php:444
+msgid "Tickets"
+msgstr "Billets"
+
+#: includes/class-catch-the-ace-settings.php:50
+#: includes/class-catch-the-ace-settings.php:269
+#: includes/class-envelope-dealer.php:174
+#: templates/single-catch-the-ace__checkout.php:50
+msgid "Checkout"
+msgstr "Paiement"
+
+#: includes/class-catch-the-ace-settings.php:51
+#: includes/class-catch-the-ace-settings.php:284
+msgid "Geolocators"
+msgstr "Géolocalisateurs"
+
+#: includes/class-catch-the-ace-settings.php:52
+msgid "Communication"
+msgstr "Communication"
+
+#: includes/class-catch-the-ace-settings.php:100
+#: includes/class-catch-the-ace-settings.php:845
+msgid "Catch the Ace Settings"
+msgstr "Paramètres de Catch the Ace"
+
+#: includes/class-catch-the-ace-settings.php:101
+msgid "Settings"
+msgstr "Paramètres"
+
+#: includes/class-catch-the-ace-settings.php:253
+msgid "Ticket Price"
+msgstr "Prix du billet"
+
+#: includes/class-catch-the-ace-settings.php:261
+msgid "Terms & Conditions URL"
+msgstr "URL des modalités"
+
+#: includes/class-catch-the-ace-settings.php:276
+#: includes/class-catch-the-ace-settings.php:577
+msgid "Payment Processor"
+msgstr "Processeur de paiement"
+
+#: includes/class-catch-the-ace-settings.php:291
+#: includes/class-catch-the-ace-settings.php:606
+msgid "Geo Locator"
+msgstr "Géolocalisateur"
+
+#: includes/class-catch-the-ace-settings.php:299
+msgid "Outside Ontario"
+msgstr "Hors Ontario"
+
+#: includes/class-catch-the-ace-settings.php:306
+msgid "Outside Ontario Message"
+msgstr "Message hors Ontario"
+
+#: includes/class-catch-the-ace-settings.php:314
+msgid "Receipts"
+msgstr "Reçus"
+
+#: includes/class-catch-the-ace-settings.php:321
+msgid "Receipt Email"
+msgstr "Courriel de reçu"
+
+#: includes/class-catch-the-ace-settings.php:329
+msgid "Successful Transaction Notification"
+msgstr "Notification de transaction réussie"
+
+#: includes/class-catch-the-ace-settings.php:336
+#: includes/class-catch-the-ace-settings.php:359
+msgid "Email Subject"
+msgstr "Objet du courriel"
+
+#: includes/class-catch-the-ace-settings.php:344
+#: includes/class-catch-the-ace-settings.php:367
+msgid "Email Body"
+msgstr "Corps du courriel"
+
+#: includes/class-catch-the-ace-settings.php:352
+msgid "Ticket Delivery Email"
+msgstr "Courriel d’envoi des billets"
+
+#: includes/class-catch-the-ace-settings.php:500
+msgid "Set the ticket price for Catch the Ace entries."
+msgstr ""
+"Définissez le prix des billets pour les participations à Catch the Ace."
+
+#: includes/class-catch-the-ace-settings.php:506
+msgid "Link to the terms and conditions page."
+msgstr "Lien vers la page des modalités."
+
+#: includes/class-catch-the-ace-settings.php:512
+msgid "Email address to receive purchase receipts."
+msgstr "Adresse courriel pour recevoir les reçus d’achat."
+
+#: includes/class-catch-the-ace-settings.php:526
+msgid "Message shown to visitors outside Ontario."
+msgstr "Message affiché aux visiteurs hors de l’Ontario."
+
+#: includes/class-catch-the-ace-settings.php:532
+msgid "Subject line for the successful transaction email."
+msgstr "Objet du courriel de transaction réussie."
+
+#: includes/class-catch-the-ace-settings.php:546
+msgid "Body content for the successful transaction email."
+msgstr "Contenu du message du courriel de transaction réussie."
+
+#: includes/class-catch-the-ace-settings.php:552
+msgid "Subject line for the ticket delivery email."
+msgstr "Objet du courriel d’envoi des billets."
+
+#: includes/class-catch-the-ace-settings.php:566
+msgid "Body content for the ticket delivery email."
+msgstr "Contenu du message du courriel d’envoi des billets."
+
+#: includes/class-catch-the-ace-settings.php:584
+msgid "Select a processor and configure its credentials if required."
+msgstr ""
+"Sélectionnez un processeur et configurez ses informations d’identification "
+"au besoin."
+
+#. translators: 1: license link open, 2: license link close
+#: includes/class-catch-the-ace-settings.php:598
+msgid ""
+"Attribution: Contains information licensed under the %1$sOpen Government "
+"Licence – Ontario%2$s."
+msgstr ""
+"Attribution : Contient des informations concédées sous licence en vertu de "
+"la %1$sLicence du gouvernement ouvert – Ontario%2$s."
+
+#: includes/class-catch-the-ace-settings.php:614
+msgid ""
+"Select a locator and configure its credentials if required (e.g., API keys)."
+msgstr ""
+"Sélectionnez un géolocalisateur et configurez ses informations "
+"d’identification au besoin (p. ex., clés API)."
+
+#: includes/class-catch-the-ace-settings.php:664
+msgid "Publishable Key"
+msgstr "Clé publiable"
+
+#: includes/class-catch-the-ace-settings.php:667
+msgid "Stripe publishable key used by Stripe.js."
+msgstr "Clé publiable Stripe utilisée par Stripe.js."
+
+#: includes/class-catch-the-ace-settings.php:670
+msgid "Secret Key"
+msgstr "Clé secrète"
+
+#: includes/class-catch-the-ace-settings.php:673
+msgid "Stripe secret key for server-side charges."
+msgstr "Clé secrète Stripe pour les paiements côté serveur."
+
+#: includes/class-catch-the-ace-settings.php:676
+msgid "Currency three-letter ISO code"
+msgstr "Code de devise ISO à trois lettres"
+
+#: includes/class-catch-the-ace-settings.php:679
+msgid ""
+"Three-letter currency code as defined by <a href=\"https://www.iso.org/"
+"iso-4217-currency-codes.html\">ISO 4217</a>. Only select <a href=\"https://"
+"stripe.com/docs/currencies\">codes supported by Stripe</a>."
+msgstr ""
+"Code de devise à trois lettres tel que défini par la <a href=\"https://"
+"www.iso.org/iso-4217-currency-codes.html\">norme ISO 4217</a>. Sélectionnez "
+"uniquement des <a href=\"https://stripe.com/docs/currencies\">codes pris en "
+"charge par Stripe</a>."
+
+#: includes/class-catch-the-ace-settings.php:696
+msgid "Account ID"
+msgstr "ID de compte"
+
+#: includes/class-catch-the-ace-settings.php:699
+msgid "MaxMind account ID for web services."
+msgstr "ID de compte MaxMind pour les services Web."
+
+#: includes/class-catch-the-ace-settings.php:702
+msgid "License Key"
+msgstr "Clé de licence"
+
+#: includes/class-catch-the-ace-settings.php:705
+msgid "MaxMind license key for web services."
+msgstr "Clé de licence MaxMind pour les services Web."
+
+#: includes/class-catch-the-ace-settings.php:756
+msgid "No providers available."
+msgstr "Aucun fournisseur disponible."
+
+#: includes/class-catch-the-ace-settings.php:811
+msgid "No configuration required."
+msgstr "Aucune configuration requise."
+
+#: includes/class-catch-the-ace-tickets.php:71
+msgid "Every 5 minutes"
+msgstr "Toutes les 5 minutes"
+
+#: includes/class-catch-the-ace-tickets.php:246
+msgid "Ticket generation started."
+msgstr "Génération des billets démarrée."
+
+#: includes/class-catch-the-ace-tickets.php:251
+msgid "No tickets were generated because the order cart is empty."
+msgstr "Aucun billet n’a été généré car le panier de la commande est vide."
+
+#: includes/class-catch-the-ace-tickets.php:258
+msgid "Ticket generation failed. The order was reset for retry."
+msgstr ""
+"La génération des billets a échoué. La commande a été réinitialisée pour "
+"réessayer."
+
+#: includes/class-catch-the-ace-tickets.php:267
+msgid "Tickets generated: %d."
+msgstr "Billets générés : %d."
+
+#: includes/class-catch-the-ace-tickets.php:453
+msgid "Export Tickets"
+msgstr "Exporter les billets"
+
+#: includes/class-catch-the-ace-tickets.php:472
+msgid "Ticket Status:"
+msgstr "État des billets :"
+
+#: includes/class-catch-the-ace-tickets.php:477
+msgid "No tickets generated yet."
+msgstr "Aucun billet généré pour l’instant."
+
+#: includes/class-catch-the-ace-tickets.php:481
+msgid "Tickets:"
+msgstr "Billets :"
+
+#: includes/class-catch-the-ace-tickets.php:483
+msgid "Created"
+msgstr "Créé"
+
+#: includes/class-catch-the-ace-tickets.php:517
+msgid ""
+"Exports tickets generated for this session between two dates (timezone: %s)."
+msgstr ""
+"Exporte les billets générés pour cette session entre deux dates (fuseau "
+"horaire : %s)."
+
+#: includes/class-catch-the-ace-tickets.php:520
+msgid "From"
+msgstr "De"
+
+#: includes/class-catch-the-ace-tickets.php:525
+msgid "To"
+msgstr "À"
+
+#: includes/class-catch-the-ace-tickets.php:530
+msgid "Export to CSV"
+msgstr "Exporter en CSV"
+
+#: includes/class-catch-the-ace-tickets.php:531
+msgid "Print Tickets"
+msgstr "Imprimer les billets"
+
+#: includes/class-catch-the-ace-tickets.php:573
+msgid "Unauthorized."
+msgstr "Non autorisé."
+
+#: includes/class-catch-the-ace-tickets.php:578 includes/class-plugin.php:342
+msgid "Invalid request."
+msgstr "Requête invalide."
+
+#: includes/class-catch-the-ace-tickets.php:583
+msgid "Invalid session."
+msgstr "Session invalide."
+
+#: includes/class-catch-the-ace-tickets.php:587
+msgid "You do not have permission to export tickets for this session."
+msgstr ""
+"Vous n’avez pas la permission d’exporter les billets pour cette session."
+
+#: includes/class-catch-the-ace-tickets.php:597
+msgid "Please provide both \"from\" and \"to\" dates."
+msgstr "Veuillez fournir les dates « De » et « À »."
+
+#: includes/class-catch-the-ace-tickets.php:601
+msgid "\"From\" must be earlier than \"to\"."
+msgstr "« De » doit être antérieur à « À »."
+
+#: includes/class-catch-the-ace-winners.php:112
+#: includes/class-envelope-dealer.php:199
+#: includes/class-envelope-dealer.php:347
+msgid "Ticket sales are currently closed."
+msgstr "La vente de billets est actuellement fermée."
+
+#: includes/class-envelope-dealer.php:190
+msgid "Ticket sales open in:"
+msgstr "La vente de billets ouvre dans :"
+
+#: includes/class-envelope-dealer.php:197
+msgid "Play now by selecting your cards!"
+msgstr "Jouez maintenant en sélectionnant vos cartes !"
+
+#: includes/class-envelope-dealer.php:207
+msgid "Week %d"
+msgstr "Semaine %d"
+
+#: includes/class-envelope-dealer.php:274
+msgid "Past Draws"
+msgstr "Tirages précédents"
+
+#: includes/class-envelope-dealer.php:316
+msgid "Envelope #%s"
+msgstr "Enveloppe nº%s"
+
+#: includes/class-envelope-dealer.php:407
+msgid "Ticket sales are open."
+msgstr "La vente de billets est ouverte."
+
+#. translators: 1: open day, 2: open time, 3: close day, 4: close time
+#: includes/class-envelope-dealer.php:410
+msgid ""
+"Ticket sales are currently closed. Sales run from %1$s at %2$s to %3$s at "
+"%4$s."
+msgstr ""
+"La vente de billets est actuellement fermée. Les ventes vont de %1$s à %2$s "
+"jusqu’à %3$s à %4$s."
+
+#: includes/class-envelope-dealer.php:604 includes/class-plugin.php:384
+msgid "Geo provider"
+msgstr "Fournisseur de géolocalisation"
+
+#: includes/class-envelope-dealer.php:612
+msgid "IP-based lookup"
+msgstr "Recherche basée sur l’IP"
+
+#: includes/class-envelope-dealer.php:615 includes/class-plugin.php:385
+msgid "Browser location"
+msgstr "Localisation du navigateur"
+
+#: includes/class-envelope-dealer.php:618
+msgid "Cached browser location"
+msgstr "Localisation du navigateur (mise en cache)"
+
+#: includes/class-envelope-dealer.php:621
+msgid "Dummy locator"
+msgstr "Géolocalisateur factice"
+
+#: includes/class-envelope-dealer.php:627 includes/class-plugin.php:385
+msgid "Lookup method"
+msgstr "Méthode de recherche"
+
+#: includes/class-envelope-dealer.php:636
+msgid "IP address"
+msgstr "Adresse IP"
+
+#: includes/class-envelope-dealer.php:644
+msgid "Estimated city"
+msgstr "Ville estimée"
+
+#: includes/class-envelope-dealer.php:657
+msgid "Estimated region"
+msgstr "Région estimée"
+
+#: includes/class-envelope-dealer.php:670
+msgid "Estimated country"
+msgstr "Pays estimé"
+
+#: includes/class-envelope-dealer.php:678
+msgid "Estimated postal code"
+msgstr "Code postal estimé"
+
+#: includes/class-envelope-dealer.php:689 includes/class-plugin.php:386
+msgid "Coordinates"
+msgstr "Coordonnées"
+
+#: includes/class-envelope-dealer.php:697
+msgid "Estimated time zone"
+msgstr "Fuseau horaire estimé"
+
+#: includes/class-envelope-dealer.php:706
+msgid "Accuracy radius"
+msgstr "Rayon de précision"
+
+#: includes/class-envelope-dealer.php:712 includes/class-plugin.php:387
+msgid "Within Ontario"
+msgstr "Dans l’Ontario"
+
+#: includes/class-envelope-dealer.php:713
+msgid "Yes"
+msgstr "Oui"
+
+#: includes/class-envelope-dealer.php:713 includes/class-plugin.php:387
+msgid "No"
+msgstr "Non"
+
+#: includes/class-envelope-dealer.php:719
+msgid "Lookup error"
+msgstr "Erreur de recherche"
+
+#: includes/class-geo-locator-dummy.php:24
+msgid "Dummy (Always Ontario)"
+msgstr "Factice (toujours en Ontario)"
+
+#: includes/class-geo-locator-dummy.php:57
+msgid "Dummy (Always Outside Ontario)"
+msgstr "Factice (toujours hors Ontario)"
+
+#: includes/class-geo-locator-maxmind.php:21
+msgid "MaxMind (Web Services)"
+msgstr "MaxMind (services Web)"
+
+#: includes/class-payment-processor-dummy.php:21
+msgid "Dummy (Always Succeeds)"
+msgstr "Factice (réussit toujours)"
+
+#: includes/class-payment-processor-dummy.php:66
+msgid "Dummy (Always Fails)"
+msgstr "Factice (échoue toujours)"
+
+#: includes/class-payment-processor-dummy.php:91
+msgid "Dummy processor configured to always fail."
+msgstr "Processeur factice configuré pour toujours échouer."
+
+#: includes/class-payment-processor-stripe.php:58
+msgid "Stripe"
+msgstr "Stripe"
+
+#: includes/class-payment-processor-stripe.php:173
+msgid "Stripe request failed."
+msgstr "La requête Stripe a échoué."
+
+#: includes/class-payment-processor-stripe.php:297
+msgid "Stripe secret key is missing."
+msgstr "La clé secrète Stripe est manquante."
+
+#: includes/class-payment-processor-stripe.php:359
+msgid "Unable to create Stripe PaymentIntent."
+msgstr "Impossible de créer le PaymentIntent Stripe."
+
+#: includes/class-payment-processor-stripe.php:390
+msgid "Stripe token missing."
+msgstr "Jeton Stripe manquant."
+
+#: includes/class-payment-processor-stripe.php:398
+msgid "Invalid amount or Stripe secret key."
+msgstr "Montant invalide ou clé secrète Stripe manquante."
+
+#: includes/class-payment-processor-stripe.php:418
+msgid "Unable to prepare Stripe PaymentIntent."
+msgstr "Impossible de préparer le PaymentIntent Stripe."
+
+#: includes/class-payment-processor-stripe.php:453
+msgid "Stripe PaymentIntent confirmation failed."
+msgstr "La confirmation du PaymentIntent Stripe a échoué."
+
+#: includes/class-payment-processor-stripe.php:461
+msgid ""
+"This card requires additional authentication which is not currently "
+"supported. Please try another card."
+msgstr ""
+"Cette carte nécessite une authentification supplémentaire qui n’est pas "
+"prise en charge pour le moment. Veuillez essayer une autre carte."
+
+#: includes/class-payment-processor-stripe.php:465
+msgid "Stripe PaymentIntent was not successful."
+msgstr "Le PaymentIntent Stripe n’a pas abouti."
+
+#: includes/class-payment-processor-stripe.php:501
+msgid "Stripe is not configured."
+msgstr "Stripe n’est pas configuré."
+
+#: includes/class-plugin.php:324
+msgid "Location required"
+msgstr "Localisation requise"
+
+#: includes/class-plugin.php:325
+msgid ""
+"This lottery is only available in Ontario. Please allow your browser to "
+"share your location so we can verify eligibility."
+msgstr ""
+"Cette loterie est offerte uniquement en Ontario. Veuillez autoriser votre "
+"navigateur à partager votre localisation afin que nous puissions vérifier "
+"votre admissibilité."
+
+#: includes/class-plugin.php:326
+msgid "Allow location"
+msgstr "Autoriser la localisation"
+
+#: includes/class-plugin.php:327
+msgid "Not now"
+msgstr "Pas maintenant"
+
+#: includes/class-plugin.php:328
+msgid "Not available in your region"
+msgstr "Non disponible dans votre région"
+
+#: includes/class-plugin.php:329
+msgid "Location error"
+msgstr "Erreur de localisation"
+
+#: includes/class-plugin.php:347
+msgid "Browser location is not enabled."
+msgstr "La localisation du navigateur n’est pas activée."
+
+#: includes/class-plugin.php:353
+msgid "Missing coordinates."
+msgstr "Coordonnées manquantes."
+
+#: includes/class-plugin.php:359
+msgid "Invalid coordinates."
+msgstr "Coordonnées invalides."
+
+#: includes/class-plugin.php:364
+msgid "Locator is not available."
+msgstr "Le géolocalisateur n’est pas disponible."
+
+#: includes/class-request-place-order.php:75
+msgid "Security check failed. Please try again."
+msgstr "Échec de la vérification de sécurité. Veuillez réessayer."
+
+#: includes/class-request-place-order.php:136
+msgid "Place order attempted with an empty or invalid cart."
+msgstr "Tentative de commande avec un panier vide ou invalide."
+
+#: includes/class-request-place-order.php:142
+msgid ""
+"Your cart is empty or no longer valid. Please go back and select envelopes."
+msgstr ""
+"Votre panier est vide ou n’est plus valide. Veuillez retourner et "
+"sélectionner des enveloppes."
+
+#: includes/class-request-place-order.php:159
+msgid "Place order failed: missing customer details."
+msgstr "Échec de la commande : informations client manquantes."
+
+#: includes/class-request-place-order.php:165
+msgid "Please provide your first name, last name, and email."
+msgstr "Veuillez fournir votre prénom, votre nom et votre adresse courriel."
+
+#: includes/class-request-place-order.php:174
+msgid "Place order failed: missing phone or location."
+msgstr "Échec de la commande : téléphone ou localisation manquants."
+
+#: includes/class-request-place-order.php:180
+msgid "Please provide your telephone number and general location."
+msgstr ""
+"Veuillez fournir votre numéro de téléphone et votre localisation générale."
+
+#: includes/class-request-place-order.php:189
+msgid "Place order failed: terms not accepted."
+msgstr "Échec de la commande : modalités non acceptées."
+
+#: includes/class-request-place-order.php:195
+msgid "You must agree to the terms and conditions to place an order."
+msgstr "Vous devez accepter les modalités pour passer une commande."
+
+#: includes/class-request-place-order.php:217
+msgid ""
+"Selected benefactor is not available for this session. Defaulted to all "
+"benefactors."
+msgstr ""
+"Le bénéficiaire sélectionné n’est pas disponible pour cette session. Réglé "
+"par défaut à tous les bénéficiaires."
+
+#: includes/class-request-place-order.php:227
+msgid "Place order failed: payment processor not configured."
+msgstr "Échec de la commande : processeur de paiement non configuré."
+
+#: includes/class-request-place-order.php:233
+msgid ""
+"Payment processor is not configured. Please contact the site administrator."
+msgstr ""
+"Le processeur de paiement n’est pas configuré. Veuillez contacter "
+"l’administrateur du site."
+
+#: includes/class-request-place-order.php:244
+msgid "Place order failed: invalid amount."
+msgstr "Échec de la commande : montant invalide."
+
+#: includes/class-request-place-order.php:250
+msgid "Payment amount is invalid. Please contact the site administrator."
+msgstr ""
+"Le montant du paiement est invalide. Veuillez contacter l’administrateur du "
+"site."
+
+#: includes/class-request-place-order.php:264
+msgid "Place order failed: unsupported currency."
+msgstr "Échec de la commande : devise non prise en charge."
+
+#: includes/class-request-place-order.php:270
+msgid "This payment method does not support the selected currency."
+msgstr "Ce mode de paiement ne prend pas en charge la devise sélectionnée."
+
+#: includes/class-request-place-order.php:299
+msgid "Catch the Ace purchase (Session #%d)"
+msgstr "Achat Catch the Ace (session nº%d)"
+
+#: includes/class-request-place-order.php:318
+msgid "Payment processing started."
+msgstr "Traitement du paiement démarré."
+
+#: includes/class-request-place-order.php:328
+msgid "Payment failed."
+msgstr "Paiement échoué."
+
+#: includes/class-request-place-order.php:337
+msgid "Payment completed (reference: %s)."
+msgstr "Paiement terminé (référence : %s)."
+
+#: includes/class-request-place-order.php:338
+msgid "Payment completed."
+msgstr "Paiement terminé."
+
+#: includes/class-request-place-order.php:346
+msgid "Payment successful. Thank you for your purchase!"
+msgstr "Paiement réussi. Merci pour votre achat !"
+
+#: includes/class-request-place-order.php:357
+msgid "Payment failed (reference: %1$s): %2$s"
+msgstr "Paiement échoué (référence : %1$s) : %2$s"
+
+#: includes/class-request-place-order.php:357
+msgid "Payment failed: %s"
+msgstr "Paiement échoué : %s"
+
+#: includes/class-request-update-cart.php:102
+msgid "Order restarted after cart update."
+msgstr "Commande redémarrée après la mise à jour du panier."
+
+#: includes/ontario-geo-locator/class-geo-locator-ontario-browser.php:41
+msgid "Ontario Boundary (Browser Location)"
+msgstr "Limites de l’Ontario (localisation du navigateur)"
+
+#: templates/archive-catch-the-ace.php:17
+msgid "Catch the Ace Sessions"
+msgstr "Sessions de Catch the Ace"
+
+#: templates/single-catch-the-ace__checkout.php:58
+msgid "Reference: %s"
+msgstr "Référence : %s"
+
+#: templates/single-catch-the-ace__checkout.php:78
+msgid ""
+"To continue, please allow location access so we can verify you are within "
+"Ontario."
+msgstr ""
+"Pour continuer, veuillez autoriser l’accès à la localisation afin que nous "
+"puissions vérifier que vous êtes en Ontario."
+
+#: templates/single-catch-the-ace__checkout.php:82
+msgid "Enable location"
+msgstr "Activer la localisation"
+
+#: templates/single-catch-the-ace__checkout.php:83
+#: templates/single-catch-the-ace__checkout.php:89
+msgid "Return to game"
+msgstr "Retour au jeu"
+
+#: templates/single-catch-the-ace__checkout.php:87
+msgid "Your cart is empty or invalid. Please go back and select envelopes."
+msgstr ""
+"Votre panier est vide ou invalide. Veuillez retourner et sélectionner des "
+"enveloppes."
+
+#: templates/single-catch-the-ace__checkout.php:91
+msgid "Order Summary"
+msgstr "Résumé de la commande"
+
+#: templates/single-catch-the-ace__checkout.php:117
+msgid "Checkout Details"
+msgstr "Détails du paiement"
+
+#: templates/single-catch-the-ace__checkout.php:128
+msgid "First Name"
+msgstr "Prénom"
+
+#: templates/single-catch-the-ace__checkout.php:132
+msgid "Last Name"
+msgstr "Nom"
+
+#: templates/single-catch-the-ace__checkout.php:136
+msgid "Email"
+msgstr "Courriel"
+
+#: templates/single-catch-the-ace__checkout.php:146
+msgid "Your location"
+msgstr "Votre localisation"
+
+#: templates/single-catch-the-ace__checkout.php:147
+msgid "Town/City"
+msgstr "Ville"
+
+#: templates/single-catch-the-ace__checkout.php:148
+msgid "General location only (not a full address)."
+msgstr "Localisation générale seulement (pas une adresse complète)."
+
+#: templates/single-catch-the-ace__checkout.php:154
+msgid "Distribute lottery proceeds amongst ALL charities"
+msgstr ""
+"Répartir les profits de la loterie entre TOUS les organismes de bienfaisance"
+
+#. translators: 1: opening link tag, 2: closing link tag
+#: templates/single-catch-the-ace__checkout.php:179
+msgid "I agree to the %1$sterms and conditions%2$s."
+msgstr "J’accepte les %1$smodalités%2$s."
+
+#: templates/single-catch-the-ace__checkout.php:184
+msgid "I agree to the terms and conditions."
+msgstr "J’accepte les modalités."
+
+#: templates/single-catch-the-ace__checkout.php:200
+msgid "Place Order"
+msgstr "Passer la commande"
+
+#: templates/single-catch-the-ace__checkout.php:201
+msgid "Back"
+msgstr "Retour"
+
+#: templates/single-catch-the-ace__winners.php:29
+msgid "Winning draws for this session."
+msgstr "Tirages gagnants pour cette session."
+
+#: templates/single-catch-the-ace__winners.php:53
+msgid "Card"
+msgstr "Carte"
+
+#: templates/single-catch-the-ace__winners.php:60
+msgid "Envelope #%d"
+msgstr "Enveloppe nº%d"
+
+#: templates/single-catch-the-ace__winners.php:63
+msgid "Winnings: %s"
+msgstr "Gains : %s"
+
+#: templates/single-catch-the-ace__winners.php:77
+msgid "No winning draws recorded yet."
+msgstr "Aucun tirage gagnant enregistré pour l’instant."

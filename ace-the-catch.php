@@ -35,6 +35,7 @@ require_once LOTTO_PATH . 'includes/class-geo-locator-dummy.php';
 require_once LOTTO_PATH . 'includes/class-geo-locator-maxmind.php';
 require_once LOTTO_PATH . 'includes/ontario-geo-locator/class-geo-locator-ontario-browser.php';
 require_once LOTTO_PATH . 'includes/class-envelope-dealer.php';
+require_once LOTTO_PATH . 'includes/class-catch-the-ace-session-shortcodes.php';
 require_once LOTTO_PATH . 'includes/class-catch-the-ace-winners.php';
 require_once LOTTO_PATH . 'includes/class-catch-the-ace-orders.php';
 require_once LOTTO_PATH . 'includes/class-catch-the-ace-tickets.php';

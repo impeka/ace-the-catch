@@ -35,18 +35,28 @@ class MaxMindGeoLocator implements GeoLocator {
 		$account = isset( $config['account_id'] ) ? \trim( (string) $config['account_id'] ) : '';
 		$license = isset( $config['license_key'] ) ? \trim( (string) $config['license_key'] ) : '';
 
-		if ( empty( $account ) || empty( $license ) ) {
-			return array(
-				'country'    => '',
-				'region'     => '',
-				'in_ontario' => false,
-				'error'      => 'MaxMind credentials are missing.',
-			);
-		}
-
 		// Fall back to visitor IP if not provided.
 		if ( empty( $ip ) && isset( $_SERVER['REMOTE_ADDR'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			$ip = (string) $_SERVER['REMOTE_ADDR']; // phpcs:ignore
+		}
+
+		if ( empty( $account ) || empty( $license ) ) {
+			return array(
+				'ip'         => (string) $ip,
+				'source'     => 'ip',
+				'country'    => '',
+				'country_name' => '',
+				'region'     => '',
+				'region_name' => '',
+				'city'       => '',
+				'postal'     => '',
+				'latitude'   => '',
+				'longitude'  => '',
+				'time_zone'  => '',
+				'accuracy_radius' => '',
+				'in_ontario' => false,
+				'error'      => 'MaxMind credentials are missing.',
+			);
 		}
 
 		// Cache by IP to reduce token usage.
@@ -72,8 +82,18 @@ class MaxMindGeoLocator implements GeoLocator {
 
 		if ( \is_wp_error( $response ) ) {
 			return array(
+				'ip'         => (string) $ip,
+				'source'     => 'ip',
 				'country'    => '',
+				'country_name' => '',
 				'region'     => '',
+				'region_name' => '',
+				'city'       => '',
+				'postal'     => '',
+				'latitude'   => '',
+				'longitude'  => '',
+				'time_zone'  => '',
+				'accuracy_radius' => '',
 				'in_ontario' => false,
 				'error'      => $response->get_error_message(),
 			);
@@ -86,24 +106,61 @@ class MaxMindGeoLocator implements GeoLocator {
 		if ( $code >= 400 ) {
 			$err = isset( $data['error'] ) ? (string) $data['error'] : 'MaxMind request failed.';
 			return array(
+				'ip'         => (string) $ip,
+				'source'     => 'ip',
 				'country'    => '',
+				'country_name' => '',
 				'region'     => '',
+				'region_name' => '',
+				'city'       => '',
+				'postal'     => '',
+				'latitude'   => '',
+				'longitude'  => '',
+				'time_zone'  => '',
+				'accuracy_radius' => '',
 				'in_ontario' => false,
 				'error'      => $err,
 			);
 		}
 
 		$country = $data['country']['iso_code'] ?? '';
+		$country_name = isset( $data['country']['names'] ) ? $this->pick_name( $data['country']['names'] ) : '';
 		$region  = '';
+		$region_name = '';
 		if ( ! empty( $data['subdivisions'][0]['iso_code'] ) ) {
 			$region = $data['subdivisions'][0]['iso_code'];
 		}
+		if ( ! empty( $data['subdivisions'][0]['names'] ) ) {
+			$region_name = $this->pick_name( $data['subdivisions'][0]['names'] );
+		}
+
+		$city = '';
+		if ( ! empty( $data['city']['names'] ) ) {
+			$city = $this->pick_name( $data['city']['names'] );
+		}
+
+		$postal = $data['postal']['code'] ?? '';
+
+		$latitude = $data['location']['latitude'] ?? '';
+		$longitude = $data['location']['longitude'] ?? '';
+		$time_zone = $data['location']['time_zone'] ?? '';
+		$accuracy_radius = $data['location']['accuracy_radius'] ?? '';
 
 		$in_ontario = ( 'CA' === $country && 'ON' === $region );
 
 		$result = array(
+			'ip'         => (string) $ip,
+			'source'     => 'ip',
 			'country'    => $country,
+			'country_name' => (string) $country_name,
 			'region'     => $region,
+			'region_name' => (string) $region_name,
+			'city'       => (string) $city,
+			'postal'     => (string) $postal,
+			'latitude'   => $latitude,
+			'longitude'  => $longitude,
+			'time_zone'  => (string) $time_zone,
+			'accuracy_radius' => $accuracy_radius,
 			'in_ontario' => $in_ontario,
 			'error'      => '',
 		);
@@ -114,5 +171,24 @@ class MaxMindGeoLocator implements GeoLocator {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Pick a localized name value from a MaxMind "names" hash.
+	 *
+	 * @param mixed $names Map of locale => label.
+	 * @return string
+	 */
+	private function pick_name( $names ): string {
+		if ( ! \is_array( $names ) ) {
+			return '';
+		}
+
+		if ( ! empty( $names['en'] ) && \is_string( $names['en'] ) ) {
+			return (string) $names['en'];
+		}
+
+		$first = \reset( $names );
+		return \is_string( $first ) ? (string) $first : '';
 	}
 }

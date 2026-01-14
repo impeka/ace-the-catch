@@ -1,2 +1,48 @@
 /* Admin styles for Ace the Catch */
 
+#cta-session-shortcodes .cta-session-shortcodes__list {
+	margin: 0;
+	padding-left: 18px;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__item {
+	display: flex;
+	gap: 6px;
+	align-items: flex-start;
+	margin: 0 0 10px;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__code {
+	flex: 1;
+	display: block;
+	white-space: normal;
+	word-break: break-word;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__copy {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	color: #2271b1;
+	line-height: 1;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__copy:hover {
+	color: #135e96;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__copy:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__copy.is-copied {
+	color: #00a32a;
+}
+
+#cta-session-shortcodes .cta-session-shortcodes__copy .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}

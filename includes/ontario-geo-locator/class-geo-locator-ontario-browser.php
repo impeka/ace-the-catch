@@ -51,7 +51,13 @@ class OntarioBrowserGeoLocator implements GeoLocator {
 		$cookie = self::read_cookie_payload();
 		if ( $cookie && isset( $cookie['in'] ) ) {
 			$in_ontario = (bool) ( (int) $cookie['in'] );
+			$lat        = isset( $cookie['lat'] ) ? (float) $cookie['lat'] : null;
+			$lng        = isset( $cookie['lng'] ) ? (float) $cookie['lng'] : null;
+
 			return array(
+				'source'     => 'cookie',
+				'lat'        => $lat,
+				'lng'        => $lng,
 				'country'    => $in_ontario ? 'CA' : '',
 				'region'     => $in_ontario ? 'ON' : '',
 				'in_ontario' => $in_ontario,
@@ -66,6 +72,9 @@ class OntarioBrowserGeoLocator implements GeoLocator {
 			$in_ontario = $this->is_within_ontario( $lat, $lng );
 
 			return array(
+				'source'     => 'browser',
+				'lat'        => $lat,
+				'lng'        => $lng,
 				'country'    => $in_ontario ? 'CA' : '',
 				'region'     => $in_ontario ? 'ON' : '',
 				'in_ontario' => $in_ontario,
@@ -75,6 +84,7 @@ class OntarioBrowserGeoLocator implements GeoLocator {
 		}
 
 		return array(
+			'source'         => 'browser',
 			'country'        => '',
 			'region'         => '',
 			'in_ontario'     => false,

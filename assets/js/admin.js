@@ -256,5 +256,72 @@
 		} );
 	};
 
+	const copyToClipboard = async ( text ) => {
+		const value = String( text || '' );
+		if ( ! value ) {
+			return false;
+		}
+
+		if ( navigator?.clipboard?.writeText && window.isSecureContext ) {
+			await navigator.clipboard.writeText( value );
+			return true;
+		}
+
+		const textarea = document.createElement( 'textarea' );
+		textarea.value = value;
+		textarea.setAttribute( 'readonly', '' );
+		textarea.style.position = 'absolute';
+		textarea.style.left = '-9999px';
+		textarea.style.top = '0';
+		document.body.appendChild( textarea );
+
+		textarea.select();
+		textarea.setSelectionRange( 0, textarea.value.length );
+
+		const ok = document.execCommand ? document.execCommand( 'copy' ) : false;
+		textarea.remove();
+		return !! ok;
+	};
+
+	const flashCopiedState = ( $button ) => {
+		const $icon = $button.find( '.dashicons' );
+		if ( ! $icon.length ) {
+			return;
+		}
+
+		$button.addClass( 'is-copied' );
+		$icon.removeClass( 'dashicons-clipboard' ).addClass( 'dashicons-yes' );
+
+		window.setTimeout( () => {
+			$button.removeClass( 'is-copied' );
+			$icon.removeClass( 'dashicons-yes' ).addClass( 'dashicons-clipboard' );
+		}, 1200 );
+	};
+
+	const initSessionShortcodesBox = () => {
+		const $box = $( '#cta-session-shortcodes' );
+		if ( ! $box.length ) {
+			return;
+		}
+
+		$box.on( 'click', '[data-cta-copy-shortcode]', async function ( e ) {
+			e.preventDefault();
+
+			const $button = $( this );
+			const shortcode = String( $button.data( 'cta-copy-shortcode' ) || '' );
+
+			try {
+				const ok = await copyToClipboard( shortcode );
+				if ( ok ) {
+					flashCopiedState( $button );
+				}
+			} catch ( err ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Catch the Ace: failed to copy shortcode', err );
+			}
+		} );
+	};
+
 	$( initTicketExportBox );
+	$( initSessionShortcodesBox );
 } )( jQuery );

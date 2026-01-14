@@ -134,6 +134,7 @@ class EnvelopeDealer {
 		$geo_status    = $this->evaluate_geo_access();
 		$geo_blocked   = $geo_status['blocked'];
 		$geo_message   = $geo_status['message'];
+		$geo_popup     = $geo_status['popup'];
 
 		if ( $geo_blocked ) {
 			$sales_status['open']        = false;
@@ -200,11 +201,7 @@ class EnvelopeDealer {
 			$header_info = '<div class="card-table-header__cta">' . \esc_html( $sales_status['message'] ) . '</div>';
 		}
 
-		$actions = '<div class="card-table-actions">
-				<a class="card-table-header__btn card-table-header__btn--ghost" href="#" aria-label="' . \esc_attr__( 'View Rules', 'ace-the-catch' ) . '">' . \esc_html__( 'Rules', 'ace-the-catch' ) . '</a>
-				<a class="card-table-header__btn card-table-header__btn--ghost" href="' . \esc_url( $winners_url ) . '" aria-label="' . \esc_attr__( 'View Past Draws', 'ace-the-catch' ) . '">' . \esc_html__( 'Past Draws', 'ace-the-catch' ) . '</a>
-				<a class="card-table-header__btn card-table-header__btn--ghost" href="#" aria-label="' . \esc_attr__( 'View FAQs', 'ace-the-catch' ) . '">' . \esc_html__( 'FAQs', 'ace-the-catch' ) . '</a>
-			</div>';
+		$actions = $this->build_card_table_actions( $post_id, $winners_url );
 
 		$card_header = '<div class="card-table-header">
 			<div class="card-table-header__week"><span class="__inner">' . \sprintf( \esc_html__( 'Week %d', 'ace-the-catch' ), ( $draws_count + 1 ) ) . '</span></div>
@@ -220,7 +217,88 @@ class EnvelopeDealer {
 			$wrap_classes .= ' card-table-wrap--closed';
 		}
 
-		return '<div class="' . $wrap_classes . '" data-session-id="' . \esc_attr( $post_id ) . '" data-session-week="' . \esc_attr( $draws_count + 1 ) . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_message ) . '" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
+		return '<div class="' . $wrap_classes . '" data-session-id="' . \esc_attr( $post_id ) . '" data-session-week="' . \esc_attr( $draws_count + 1 ) . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_popup ) . '" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
+	}
+
+	/**
+	 * Build the card table navigation (links above the card table).
+	 *
+	 * Links come from ACF "card_table_navigation_links" (repeater of link field),
+	 * and "Past Draws" is appended automatically unless "hide_past_draws_link" is enabled.
+	 *
+	 * @param int    $post_id Session post ID.
+	 * @param string $winners_url Winners URL for the session.
+	 * @return string Full navigation markup (or empty string).
+	 */
+	private function build_card_table_actions( int $post_id, string $winners_url ): string {
+		$links = array();
+
+		if ( \function_exists( 'get_field' ) ) {
+			$rows = \get_field( 'card_table_navigation_links', $post_id );
+			if ( \is_array( $rows ) ) {
+				foreach ( $rows as $row ) {
+					if ( ! \is_array( $row ) ) {
+						continue;
+					}
+
+					$link = $row['link'] ?? null;
+					if ( ! \is_array( $link ) ) {
+						continue;
+					}
+
+					$url = isset( $link['url'] ) ? \trim( (string) $link['url'] ) : '';
+					$title = isset( $link['title'] ) ? \trim( (string) $link['title'] ) : '';
+					$target = isset( $link['target'] ) ? \trim( (string) $link['target'] ) : '';
+
+					if ( '' === $url || '' === $title ) {
+						continue;
+					}
+
+					$links[] = array(
+						'url'    => $url,
+						'title'  => $title,
+						'target' => $target,
+					);
+				}
+			}
+		}
+
+		$hide_past_draws = false;
+		if ( \function_exists( 'get_field' ) ) {
+			$hide_past_draws = (bool) \get_field( 'hide_past_draws_link', $post_id );
+		}
+
+		if ( ! $hide_past_draws && '' !== $winners_url ) {
+			$links[] = array(
+				'url'    => $winners_url,
+				'title'  => \__( 'Past Draws', 'ace-the-catch' ),
+				'target' => '',
+			);
+		}
+
+		if ( empty( $links ) ) {
+			return '';
+		}
+
+		$html = '<div class="card-table-actions">';
+		foreach ( $links as $link ) {
+			$url = isset( $link['url'] ) ? (string) $link['url'] : '';
+			$title = isset( $link['title'] ) ? (string) $link['title'] : '';
+			$target = isset( $link['target'] ) ? (string) $link['target'] : '';
+
+			if ( '' === $url || '' === $title ) {
+				continue;
+			}
+
+			$target_attr = $target ? ' target="' . \esc_attr( $target ) . '"' : '';
+			$rel_attr = ( '_blank' === $target ) ? ' rel="noopener noreferrer"' : '';
+
+			$html .= '<a class="card-table-header__btn card-table-header__btn--ghost" href="' . \esc_url( $url ) . '"' . $target_attr . $rel_attr . ' aria-label="' . \esc_attr( $title ) . '">' . \esc_html( $title ) . '</a>';
+		}
+
+		$html .= '</div>';
+
+		return $html;
 	}
 
 	/**
@@ -451,25 +529,34 @@ class EnvelopeDealer {
 	/**
 	 * Evaluate geo access based on selected locator and configured message.
 	 *
-	 * @return array{blocked:bool,message:string}
+	 * @return array{blocked:bool,message:string,popup:string}
 	 */
 	private function evaluate_geo_access(): array {
 		$blocked          = false;
 		$default_message  = \__( 'Ticket sales are not available in your region.', 'ace-the-catch' );
 		$admin_message    = \get_option( CatchTheAceSettings::OPTION_OUTSIDE_MESSAGE, '' );
-		$message          = $admin_message ? \wp_kses_post( $admin_message ) : $default_message;
+		$message_html     = $admin_message ? \wp_kses_post( $admin_message ) : $default_message;
+		$message_text     = \wp_strip_all_tags( $message_html );
 		$locator_key      = \get_option( CatchTheAceSettings::OPTION_GEO_LOCATOR, '' );
 		$locator_configs  = \get_option( CatchTheAceSettings::OPTION_GEO_LOCATOR_CFG, array() );
 
 		if ( empty( $locator_key ) ) {
-			return array( 'blocked' => false, 'message' => $message );
+			return array(
+				'blocked' => false,
+				'message' => $message_text,
+				'popup'   => $message_html,
+			);
 		}
 
 		$factory = Plugin::instance()->get_geo_locator_factory();
 		$locator = $factory->create( $locator_key );
 
 		if ( ! $locator ) {
-			return array( 'blocked' => false, 'message' => $message );
+			return array(
+				'blocked' => false,
+				'message' => $message_text,
+				'popup'   => $message_html,
+			);
 		}
 
 		$config = ( \is_array( $locator_configs ) && isset( $locator_configs[ $locator_key ] ) && \is_array( $locator_configs[ $locator_key ] ) )
@@ -487,9 +574,168 @@ class EnvelopeDealer {
 		$in_ontario = isset( $result['in_ontario'] ) ? (bool) $result['in_ontario'] : false;
 		$blocked    = ! $in_ontario;
 
+		$popup = $message_html;
+		if ( $blocked ) {
+			$details_html = $this->build_geo_details_table( $locator, (string) $ip, $result );
+			if ( '' !== $details_html ) {
+				$popup .= $details_html;
+			}
+		}
+
 		return array(
 			'blocked' => $blocked,
-			'message' => $message,
+			'message' => $message_text,
+			'popup'   => $popup,
 		);
+	}
+
+	/**
+	 * Render a geo details table for blocked users.
+	 *
+	 * @param GeoLocator $locator Locator implementation.
+	 * @param string     $ip IP address used for lookup (when applicable).
+	 * @param array      $result Locator result.
+	 * @return string
+	 */
+	private function build_geo_details_table( GeoLocator $locator, string $ip, array $result ): string {
+		$rows = array();
+
+		$rows[] = array(
+			'label' => \__( 'Geo provider', 'ace-the-catch' ),
+			'value' => $locator->get_label(),
+		);
+
+		$source = isset( $result['source'] ) ? (string) $result['source'] : '';
+		$source_label = '';
+		switch ( $source ) {
+			case 'ip':
+				$source_label = \__( 'IP-based lookup', 'ace-the-catch' );
+				break;
+			case 'browser':
+				$source_label = \__( 'Browser location', 'ace-the-catch' );
+				break;
+			case 'cookie':
+				$source_label = \__( 'Cached browser location', 'ace-the-catch' );
+				break;
+			case 'dummy':
+				$source_label = \__( 'Dummy locator', 'ace-the-catch' );
+				break;
+		}
+
+		if ( '' !== $source_label ) {
+			$rows[] = array(
+				'label' => \__( 'Lookup method', 'ace-the-catch' ),
+				'value' => $source_label,
+			);
+		}
+
+		$show_ip = \in_array( $source, array( 'ip', 'dummy', '' ), true );
+		$ip_used = isset( $result['ip'] ) && '' !== (string) $result['ip'] ? (string) $result['ip'] : $ip;
+		if ( $show_ip && '' !== $ip_used ) {
+			$rows[] = array(
+				'label' => \__( 'IP address', 'ace-the-catch' ),
+				'value' => $ip_used,
+			);
+		}
+
+		$city = isset( $result['city'] ) ? \trim( (string) $result['city'] ) : '';
+		if ( '' !== $city ) {
+			$rows[] = array(
+				'label' => \__( 'Estimated city', 'ace-the-catch' ),
+				'value' => $city,
+			);
+		}
+
+		$region_code = isset( $result['region'] ) ? \trim( (string) $result['region'] ) : '';
+		$region_name = isset( $result['region_name'] ) ? \trim( (string) $result['region_name'] ) : '';
+		if ( '' !== $region_name || '' !== $region_code ) {
+			$value = $region_name ?: $region_code;
+			if ( $region_name && $region_code && $region_name !== $region_code ) {
+				$value .= ' (' . $region_code . ')';
+			}
+			$rows[] = array(
+				'label' => \__( 'Estimated region', 'ace-the-catch' ),
+				'value' => $value,
+			);
+		}
+
+		$country_code = isset( $result['country'] ) ? \trim( (string) $result['country'] ) : '';
+		$country_name = isset( $result['country_name'] ) ? \trim( (string) $result['country_name'] ) : '';
+		if ( '' !== $country_name || '' !== $country_code ) {
+			$value = $country_name ?: $country_code;
+			if ( $country_name && $country_code && $country_name !== $country_code ) {
+				$value .= ' (' . $country_code . ')';
+			}
+			$rows[] = array(
+				'label' => \__( 'Estimated country', 'ace-the-catch' ),
+				'value' => $value,
+			);
+		}
+
+		$postal = isset( $result['postal'] ) ? \trim( (string) $result['postal'] ) : '';
+		if ( '' !== $postal ) {
+			$rows[] = array(
+				'label' => \__( 'Estimated postal code', 'ace-the-catch' ),
+				'value' => $postal,
+			);
+		}
+
+		$lat = $result['lat'] ?? ( $result['latitude'] ?? null );
+		$lng = $result['lng'] ?? ( $result['longitude'] ?? null );
+		if ( null !== $lat && '' !== (string) $lat && null !== $lng && '' !== (string) $lng ) {
+			$lat_str = \is_numeric( $lat ) ? \number_format( (float) $lat, 6, '.', '' ) : (string) $lat;
+			$lng_str = \is_numeric( $lng ) ? \number_format( (float) $lng, 6, '.', '' ) : (string) $lng;
+			$rows[] = array(
+				'label' => \__( 'Coordinates', 'ace-the-catch' ),
+				'value' => $lat_str . ', ' . $lng_str,
+			);
+		}
+
+		$tz = isset( $result['time_zone'] ) ? \trim( (string) $result['time_zone'] ) : '';
+		if ( '' !== $tz ) {
+			$rows[] = array(
+				'label' => \__( 'Estimated time zone', 'ace-the-catch' ),
+				'value' => $tz,
+			);
+		}
+
+		$radius = $result['accuracy_radius'] ?? '';
+		if ( '' !== (string) $radius ) {
+			$value = \is_numeric( $radius ) ? ( (string) (int) $radius ) . ' km' : (string) $radius;
+			$rows[] = array(
+				'label' => \__( 'Accuracy radius', 'ace-the-catch' ),
+				'value' => $value,
+			);
+		}
+
+		$rows[] = array(
+			'label' => \__( 'Within Ontario', 'ace-the-catch' ),
+			'value' => ! empty( $result['in_ontario'] ) ? \__( 'Yes', 'ace-the-catch' ) : \__( 'No', 'ace-the-catch' ),
+		);
+
+		$error = isset( $result['error'] ) ? \trim( (string) $result['error'] ) : '';
+		if ( '' !== $error ) {
+			$rows[] = array(
+				'label' => \__( 'Lookup error', 'ace-the-catch' ),
+				'value' => $error,
+			);
+		}
+
+		if ( empty( $rows ) ) {
+			return '';
+		}
+
+		$html = '<div class="ace-geo-details-wrap"><table class="ace-geo-details"><tbody>';
+		foreach ( $rows as $row ) {
+			$label = isset( $row['label'] ) ? (string) $row['label'] : '';
+			$value = isset( $row['value'] ) ? (string) $row['value'] : '';
+			if ( '' === $label || '' === $value ) {
+				continue;
+			}
+			$html .= '<tr><th>' . \esc_html( $label ) . '</th><td>' . \esc_html( $value ) . '</td></tr>';
+		}
+		$html .= '</tbody></table></div>';
+
+		return $html;
 	}
 }
