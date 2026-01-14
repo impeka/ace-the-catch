@@ -149,11 +149,22 @@ class CatchTheAceWinners {
 		$open_dt  = $week_start->modify( '+' . $day_map[ $open_day ] . ' days' )->setTime( $open_hour, $open_min, 0 );
 		$close_dt = $week_start->modify( '+' . $day_map[ $close_day ] . ' days' )->setTime( $close_hour, $close_min, 0 );
 
-		$is_open = ( $now >= $open_dt && $now <= $close_dt );
+		// If the opening day/time occurs after the closing day/time in the same week, treat the window as wrapping
+		// across the week boundary (ex: open Friday, close Monday).
+		$wraps_week = ( $open_dt > $close_dt );
+
+		$is_open = $wraps_week
+			? ( $now >= $open_dt || $now <= $close_dt )
+			: ( $now >= $open_dt && $now <= $close_dt );
+
+		$close_dt_for_epoch = $close_dt;
+		if ( $wraps_week && $is_open && $now >= $open_dt ) {
+			$close_dt_for_epoch = $close_dt->modify( '+7 days' );
+		}
 
 		return array(
 			'open'        => $is_open,
-			'close_epoch' => $close_dt->getTimestamp(),
+			'close_epoch' => $close_dt_for_epoch->getTimestamp(),
 			'message'     => $default['message'],
 		);
 	}

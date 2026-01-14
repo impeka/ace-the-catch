@@ -49,6 +49,15 @@ class MaxMindGeoLocator implements GeoLocator {
 			$ip = (string) $_SERVER['REMOTE_ADDR']; // phpcs:ignore
 		}
 
+		// Cache by IP to reduce token usage.
+		$cache_key = $ip ? 'ace_mm_' . md5( $ip ) : '';
+		if ( $cache_key ) {
+			$cached = \get_transient( $cache_key );
+			if ( \is_array( $cached ) && isset( $cached['in_ontario'] ) ) {
+				return $cached;
+			}
+		}
+
 		$endpoint = 'https://geoip.maxmind.com/geoip/v2.1/city/' . rawurlencode( $ip );
 		$response = \wp_remote_get(
 			$endpoint,
@@ -92,11 +101,18 @@ class MaxMindGeoLocator implements GeoLocator {
 
 		$in_ontario = ( 'CA' === $country && 'ON' === $region );
 
-		return array(
+		$result = array(
 			'country'    => $country,
 			'region'     => $region,
 			'in_ontario' => $in_ontario,
 			'error'      => '',
 		);
+
+		if ( $cache_key ) {
+			// Cache for 24 hours.
+			\set_transient( $cache_key, $result, DAY_IN_SECONDS );
+		}
+
+		return $result;
 	}
 }

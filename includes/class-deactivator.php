@@ -22,6 +22,8 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
+		\wp_clear_scheduled_hook( CatchTheAceOrders::CRON_HOOK_ABANDON_ORDERS );
+		\wp_clear_scheduled_hook( CatchTheAceTickets::CRON_HOOK_GENERATE_TICKETS );
 		\flush_rewrite_rules();
 	}
 }

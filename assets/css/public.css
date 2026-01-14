@@ -1,2 +1,145 @@
 /* Public styles for Ace the Catch */
 
+.catch-the-ace__wrapper .notice {
+	margin: 12px 0 18px;
+	padding: 12px 14px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-left-width: 4px;
+	border-radius: 12px;
+	background: #f8fafc;
+	color: #0f172a;
+}
+
+.catch-the-ace__wrapper .notice p {
+	margin: 0 0 6px;
+}
+
+.catch-the-ace__wrapper .notice p:last-child {
+	margin-bottom: 0;
+}
+
+.catch-the-ace__wrapper .notice-success {
+	border-left-color: #16a34a;
+	background: #f0fdf4;
+	color: #14532d;
+}
+
+.catch-the-ace__wrapper .notice-error {
+	border-left-color: #dc2626;
+	background: #fef2f2;
+	color: #7f1d1d;
+}
+
+.catch-the-ace__wrapper .notice-warning {
+	border-left-color: #d97706;
+	background: #fffbeb;
+	color: #7c2d12;
+}
+
+.ace-checkout-form {
+	max-width: 700px;
+	margin: 0 0 24px;
+	padding: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 14px;
+	background: #ffffff;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ace-checkout-form__grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 14px;
+}
+
+@media (min-width: 640px) {
+	.ace-checkout-form__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.ace-checkout-form__field {
+	margin: 0;
+}
+
+.ace-checkout-form__field--full {
+	grid-column: 1 / -1;
+}
+
+.ace-checkout-form__field label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.ace-checkout-form__field input[type="text"],
+.ace-checkout-form__field input[type="email"],
+.ace-checkout-form__field input[type="tel"],
+.ace-checkout-form__field input[type="number"],
+.ace-checkout-form__field select {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	border: 1px solid rgba(15, 23, 42, 0.18);
+	border-radius: 12px;
+	background: #ffffff;
+	color: #0f172a;
+	font-size: 16px;
+	line-height: 1.25;
+}
+
+.ace-checkout-form__field input[type="text"]:focus,
+.ace-checkout-form__field input[type="email"]:focus,
+.ace-checkout-form__field input[type="tel"]:focus,
+.ace-checkout-form__field input[type="number"]:focus,
+.ace-checkout-form__field select:focus {
+	outline: none;
+	border-color: rgba(37, 99, 235, 0.9);
+	box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.ace-checkout-form__help {
+	display: block;
+	margin-top: 6px;
+	font-size: 13px;
+	color: #475569;
+}
+
+.ace-checkout-form__terms label {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+	line-height: 1.35;
+	font-weight: 500;
+}
+
+.ace-checkout-form__terms input[type="checkbox"] {
+	margin-top: 3px;
+}
+
+.ace-checkout-form__payment {
+	display: block;
+}
+
+.ace-checkout-form__stripe-card {
+	padding: 12px;
+	border: 1px solid rgba(15, 23, 42, 0.18);
+	border-radius: 12px;
+	background: #ffffff;
+}
+
+.ace-checkout-form__error {
+	margin-top: 8px;
+	font-size: 14px;
+	color: #b91c1c;
+}
+
+.ace-checkout-form__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
+	margin-top: 6px;
+}

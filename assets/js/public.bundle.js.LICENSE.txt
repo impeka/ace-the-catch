@@ -1,0 +1,12 @@
+/*!
+ * Project : simplyCountdown.js
+ * Date : 2024-12-29
+ * License : MIT
+ * Version : 3.0.1
+ * Author : Vincent Loy-Serre
+ * Contributors :
+ *  - Justin Beasley
+ *  - Nathan Smith
+ *  - Mehdi Rezaei
+ *  - mira01
+ */

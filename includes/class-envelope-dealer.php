@@ -147,6 +147,8 @@ class EnvelopeDealer {
 		$winners_url = \trailingslashit( $permalink . 'winners' );
 		$next_draw   = $this->get_next_draw_datetime( $post_id );
 
+		$checkout_url = \trailingslashit( $permalink . 'checkout' );
+
 		$cart_markup = '
 			<div class="ace-cart" id="ace-cart" hidden data-ticket-price="' . \esc_attr( $ticket_price ) . '">
 				<div class="ace-cart__header">Cart</div>
@@ -167,6 +169,9 @@ class EnvelopeDealer {
 						</tr>
 					</tfoot>
 				</table>
+				<div class="ace-checkout-actions">
+					<button type="button" class="ace-checkout-btn" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . \esc_html__( 'Checkout', 'ace-the-catch' ) . '</button>
+				</div>
 			</div>';
 
 		$draw_countdown_markup = '';
@@ -215,7 +220,7 @@ class EnvelopeDealer {
 			$wrap_classes .= ' card-table-wrap--closed';
 		}
 
-		return '<div class="' . $wrap_classes . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_message ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
+		return '<div class="' . $wrap_classes . '" data-session-id="' . \esc_attr( $post_id ) . '" data-session-week="' . \esc_attr( $draws_count + 1 ) . '" data-sales-open="' . ( $sales_status['open'] ? '1' : '0' ) . '" data-sales-message="' . \esc_attr( $sales_status['message'] ) . '" data-sales-close-epoch="' . \esc_attr( $sales_status['close_epoch'] ) . '" data-geo-block="' . ( $geo_blocked ? '1' : '0' ) . '" data-geo-message="' . \esc_attr( $geo_message ) . '" data-checkout-url="' . \esc_url( $checkout_url ) . '">' . $actions . '<div class="card-table">' . $card_header . $this->build_envelopes( $card_map, $sales_status['open'] ) . '</div>' . $cart_markup . '</div>';
 	}
 
 	/**
@@ -303,11 +308,21 @@ class EnvelopeDealer {
 		$open_dt  = $week_start->modify( '+' . $day_map[ $open_day ] . ' days' )->setTime( $open_hour, $open_min, 0 );
 		$close_dt = $week_start->modify( '+' . $day_map[ $close_day ] . ' days' )->setTime( $close_hour, $close_min, 0 );
 
-		$is_open = ( $now >= $open_dt && $now <= $close_dt );
+		// If the opening day/time occurs after the closing day/time in the same week, treat the window as wrapping
+		// across the week boundary (ex: open Friday, close Monday).
+		$wraps_week = ( $open_dt > $close_dt );
 
-		// Determine the next opening time (this week or next week).
-		if ( $now > $close_dt ) {
-			$open_dt = $open_dt->modify( '+7 days' );
+		$is_open = $wraps_week
+			? ( $now >= $open_dt || $now <= $close_dt )
+			: ( $now >= $open_dt && $now <= $close_dt );
+
+		// Next weekly opening time (used for countdown when sales are closed).
+		$next_open_dt = ( $now < $open_dt ) ? $open_dt : $open_dt->modify( '+7 days' );
+
+		// Ensure close_epoch is in the future when sales are currently open (important for client-side auto-close).
+		$close_dt_for_epoch = $close_dt;
+		if ( $wraps_week && $is_open && $now >= $open_dt ) {
+			$close_dt_for_epoch = $close_dt->modify( '+7 days' );
 		}
 
 		$message = $is_open
@@ -324,8 +339,8 @@ class EnvelopeDealer {
 		return array(
 			'open'        => $is_open,
 			'message'     => $message,
-			'close_epoch' => $close_dt->getTimestamp(),
-			'open_epoch'  => $open_dt->getTimestamp(),
+			'close_epoch' => $close_dt_for_epoch->getTimestamp(),
+			'open_epoch'  => $next_open_dt->getTimestamp(),
 		);
 	}
 

@@ -16,7 +16,9 @@ class TemplateManager {
 	public function __construct() {
 		\add_filter( 'template_include', array( $this, 'maybe_use_plugin_template' ) );
 		\add_action( 'init', array( $this, 'add_winners_rewrite' ) );
+		\add_action( 'init', array( $this, 'add_checkout_rewrite' ) );
 		\add_filter( 'query_vars', array( $this, 'register_query_vars' ) );
+		\add_action( 'template_redirect', array( $this, 'maybe_disable_cache' ), 0 );
 	}
 
 	/**
@@ -33,6 +35,19 @@ class TemplateManager {
 	}
 
 	/**
+	 * Register a checkout endpoint only for the Catch the Ace CPT.
+	 *
+	 * @return void
+	 */
+	public function add_checkout_rewrite(): void {
+		\add_rewrite_rule(
+			'^catch-the-ace/([^/]+)/checkout/?$',
+			'index.php?post_type=catch-the-ace&name=$matches[1]&view_checkout=1',
+			'top'
+		);
+	}
+
+	/**
 	 * Register custom query vars.
 	 *
 	 * @param array $vars Existing query vars.
@@ -40,6 +55,7 @@ class TemplateManager {
 	 */
 	public function register_query_vars( array $vars ): array {
 		$vars[] = 'view_winners';
+		$vars[] = 'view_checkout';
 		return $vars;
 	}
 
@@ -56,6 +72,10 @@ class TemplateManager {
 
 		if ( \is_singular( 'catch-the-ace' ) ) {
 			$view_winners = \get_query_var( 'view_winners' );
+			$view_checkout = \get_query_var( 'view_checkout' );
+			if ( '' !== $view_checkout ) {
+				return $this->resolve_template( 'single-catch-the-ace__checkout.php', $template );
+			}
 			if ( '' !== $view_winners ) {
 				return $this->resolve_template( 'single-catch-the-ace__winners.php', $template );
 			}
@@ -64,6 +84,34 @@ class TemplateManager {
 		}
 
 		return $template;
+	}
+
+	/**
+	 * Disable page caching for dynamic checkout requests.
+	 *
+	 * @return void
+	 */
+	public function maybe_disable_cache(): void {
+		if ( ! \is_singular( 'catch-the-ace' ) ) {
+			return;
+		}
+
+		$view_checkout = \get_query_var( 'view_checkout' );
+		if ( '' === $view_checkout ) {
+			return;
+		}
+
+		if ( ! \defined( 'DONOTCACHEPAGE' ) ) {
+			\define( 'DONOTCACHEPAGE', true );
+		}
+		if ( ! \defined( 'DONOTCACHEOBJECT' ) ) {
+			\define( 'DONOTCACHEOBJECT', true );
+		}
+		if ( ! \defined( 'DONOTMINIFY' ) ) {
+			\define( 'DONOTMINIFY', true );
+		}
+
+		\nocache_headers();
 	}
 
 	/**

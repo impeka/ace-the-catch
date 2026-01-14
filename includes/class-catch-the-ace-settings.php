@@ -21,13 +21,72 @@ class CatchTheAceSettings {
 	const OPTION_GEO_LOCATOR       = 'catch_the_ace_geo_locator';
 	const OPTION_GEO_LOCATOR_CFG   = 'catch_the_ace_geo_locator_configs';
 	const OPTION_OUTSIDE_MESSAGE   = 'catch_the_ace_outside_message';
+	const OPTION_SUCCESS_EMAIL_SUBJECT = 'catch_the_ace_success_email_subject';
+	const OPTION_SUCCESS_EMAIL_BODY    = 'catch_the_ace_success_email_body';
+	const OPTION_TICKET_EMAIL_SUBJECT  = 'catch_the_ace_ticket_email_subject';
+	const OPTION_TICKET_EMAIL_BODY     = 'catch_the_ace_ticket_email_body';
 	const OPTION_GROUP             = 'catch_the_ace_options';
 	const MENU_SLUG                = 'catch-the-ace-settings';
+
+	private const TAB_TICKETS       = 'tickets';
+	private const TAB_CHECKOUT      = 'checkout';
+	private const TAB_GEOLOCATORS   = 'geolocators';
+	private const TAB_COMMUNICATION = 'communication';
 
 	public function __construct() {
 		\add_action( 'admin_init', array( $this, 'register_settings' ) );
 		\add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		\add_action( 'admin_head', array( $this, 'admin_styles' ) );
+	}
+
+	/**
+	 * Get available settings tabs.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_tabs(): array {
+		return array(
+			self::TAB_TICKETS       => \__( 'Tickets', 'ace-the-catch' ),
+			self::TAB_CHECKOUT      => \__( 'Checkout', 'ace-the-catch' ),
+			self::TAB_GEOLOCATORS   => \__( 'Geolocators', 'ace-the-catch' ),
+			self::TAB_COMMUNICATION => \__( 'Communication', 'ace-the-catch' ),
+		);
+	}
+
+	/**
+	 * Get current settings tab from query string.
+	 *
+	 * @return string
+	 */
+	private function get_current_tab(): string {
+		$tab = isset( $_GET['tab'] ) ? \sanitize_key( (string) \wp_unslash( $_GET['tab'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$tabs = \array_keys( $this->get_tabs() );
+
+		return \in_array( $tab, $tabs, true ) ? $tab : self::TAB_TICKETS;
+	}
+
+	/**
+	 * Settings API page identifier for a tab.
+	 *
+	 * @param string $tab Tab slug.
+	 * @return string
+	 */
+	private function get_settings_page_for_tab( string $tab ): string {
+		return self::MENU_SLUG . '_' . $tab;
+	}
+
+	/**
+	 * Settings group identifier for a tab (used by settings_fields/options.php).
+	 *
+	 * Important: each tab must have its own group, otherwise saving one tab will
+	 * overwrite settings from the other tabs (because WordPress updates all
+	 * registered settings in a group on submit).
+	 *
+	 * @param string $tab Tab slug.
+	 * @return string
+	 */
+	private function get_settings_group_for_tab( string $tab ): string {
+		return self::OPTION_GROUP . '_' . $tab;
 	}
 
 	/**
@@ -52,8 +111,13 @@ class CatchTheAceSettings {
 	 * @return void
 	 */
 	public function register_settings(): void {
+		$group_tickets       = $this->get_settings_group_for_tab( self::TAB_TICKETS );
+		$group_checkout      = $this->get_settings_group_for_tab( self::TAB_CHECKOUT );
+		$group_geolocators   = $this->get_settings_group_for_tab( self::TAB_GEOLOCATORS );
+		$group_communication = $this->get_settings_group_for_tab( self::TAB_COMMUNICATION );
+
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_tickets,
 			self::OPTION_TICKET_PRICE,
 			array(
 				'type'              => 'number',
@@ -63,7 +127,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_tickets,
 			self::OPTION_TERMS_URL,
 			array(
 				'type'              => 'string',
@@ -73,7 +137,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_communication,
 			self::OPTION_RECEIPT_EMAIL,
 			array(
 				'type'              => 'string',
@@ -83,7 +147,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_checkout,
 			self::OPTION_PAYMENT_PROC,
 			array(
 				'type'              => 'string',
@@ -93,7 +157,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_checkout,
 			self::OPTION_PAYMENT_PROC_CFG,
 			array(
 				'type'              => 'array',
@@ -103,7 +167,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_geolocators,
 			self::OPTION_GEO_LOCATOR,
 			array(
 				'type'              => 'string',
@@ -113,7 +177,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_geolocators,
 			self::OPTION_GEO_LOCATOR_CFG,
 			array(
 				'type'              => 'array',
@@ -123,7 +187,7 @@ class CatchTheAceSettings {
 		);
 
 		\register_setting(
-			self::OPTION_GROUP,
+			$group_geolocators,
 			self::OPTION_OUTSIDE_MESSAGE,
 			array(
 				'type'              => 'string',
@@ -132,66 +196,178 @@ class CatchTheAceSettings {
 			)
 		);
 
+		\register_setting(
+			$group_communication,
+			self::OPTION_SUCCESS_EMAIL_SUBJECT,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_email_subject' ),
+				'default'           => '',
+			)
+		);
+
+		\register_setting(
+			$group_communication,
+			self::OPTION_SUCCESS_EMAIL_BODY,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_email_html' ),
+				'default'           => '',
+			)
+		);
+
+		\register_setting(
+			$group_communication,
+			self::OPTION_TICKET_EMAIL_SUBJECT,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_email_subject' ),
+				'default'           => '',
+			)
+		);
+
+		\register_setting(
+			$group_communication,
+			self::OPTION_TICKET_EMAIL_BODY,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_email_html' ),
+				'default'           => '',
+			)
+		);
+
+		$page_tickets = $this->get_settings_page_for_tab( self::TAB_TICKETS );
+		$page_checkout = $this->get_settings_page_for_tab( self::TAB_CHECKOUT );
+		$page_geolocators = $this->get_settings_page_for_tab( self::TAB_GEOLOCATORS );
+		$page_communication = $this->get_settings_page_for_tab( self::TAB_COMMUNICATION );
+
 		\add_settings_section(
-			'catch_the_ace_main_section',
-			\__( 'Ticket & Receipt Settings', 'ace-the-catch' ),
+			'catch_the_ace_tickets_section',
+			\__( 'Tickets', 'ace-the-catch' ),
 			'__return_false',
-			self::MENU_SLUG
+			$page_tickets
 		);
 
 		\add_settings_field(
 			self::OPTION_TICKET_PRICE,
 			\__( 'Ticket Price', 'ace-the-catch' ),
 			array( $this, 'render_price_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_main_section'
+			$page_tickets,
+			'catch_the_ace_tickets_section'
 		);
 
 		\add_settings_field(
 			self::OPTION_TERMS_URL,
 			\__( 'Terms & Conditions URL', 'ace-the-catch' ),
 			array( $this, 'render_terms_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_main_section'
-		);
-
-		\add_settings_field(
-			self::OPTION_RECEIPT_EMAIL,
-			\__( 'Receipt Email', 'ace-the-catch' ),
-			array( $this, 'render_email_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_main_section'
-		);
-
-		\add_settings_field(
-			self::OPTION_OUTSIDE_MESSAGE,
-			\__( 'Outside Ontario Message', 'ace-the-catch' ),
-			array( $this, 'render_outside_message_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_main_section'
+			$page_tickets,
+			'catch_the_ace_tickets_section'
 		);
 
 		\add_settings_section(
-			'catch_the_ace_integrations_section',
-			\__( 'Integrations', 'ace-the-catch' ),
+			'catch_the_ace_checkout_section',
+			\__( 'Checkout', 'ace-the-catch' ),
 			'__return_false',
-			self::MENU_SLUG
+			$page_checkout
 		);
 
 		\add_settings_field(
 			self::OPTION_PAYMENT_PROC,
 			\__( 'Payment Processor', 'ace-the-catch' ),
 			array( $this, 'render_payment_processor_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_integrations_section'
+			$page_checkout,
+			'catch_the_ace_checkout_section'
+		);
+
+		\add_settings_section(
+			'catch_the_ace_geolocators_section',
+			\__( 'Geolocators', 'ace-the-catch' ),
+			'__return_false',
+			$page_geolocators
 		);
 
 		\add_settings_field(
 			self::OPTION_GEO_LOCATOR,
-			\__( 'GeoIP Locator', 'ace-the-catch' ),
+			\__( 'Geo Locator', 'ace-the-catch' ),
 			array( $this, 'render_geo_locator_field' ),
-			self::MENU_SLUG,
-			'catch_the_ace_integrations_section'
+			$page_geolocators,
+			'catch_the_ace_geolocators_section'
+		);
+
+		\add_settings_section(
+			'catch_the_ace_geo_access_section',
+			\__( 'Outside Ontario', 'ace-the-catch' ),
+			'__return_false',
+			$page_geolocators
+		);
+
+		\add_settings_field(
+			self::OPTION_OUTSIDE_MESSAGE,
+			\__( 'Outside Ontario Message', 'ace-the-catch' ),
+			array( $this, 'render_outside_message_field' ),
+			$page_geolocators,
+			'catch_the_ace_geo_access_section'
+		);
+
+		\add_settings_section(
+			'catch_the_ace_receipts_section',
+			\__( 'Receipts', 'ace-the-catch' ),
+			'__return_false',
+			$page_communication
+		);
+
+		\add_settings_field(
+			self::OPTION_RECEIPT_EMAIL,
+			\__( 'Receipt Email', 'ace-the-catch' ),
+			array( $this, 'render_email_field' ),
+			$page_communication,
+			'catch_the_ace_receipts_section'
+		);
+
+		\add_settings_section(
+			'catch_the_ace_success_email_section',
+			\__( 'Successful Transaction Notification', 'ace-the-catch' ),
+			'__return_false',
+			$page_communication
+		);
+
+		\add_settings_field(
+			self::OPTION_SUCCESS_EMAIL_SUBJECT,
+			\__( 'Email Subject', 'ace-the-catch' ),
+			array( $this, 'render_success_email_subject_field' ),
+			$page_communication,
+			'catch_the_ace_success_email_section'
+		);
+
+		\add_settings_field(
+			self::OPTION_SUCCESS_EMAIL_BODY,
+			\__( 'Email Body', 'ace-the-catch' ),
+			array( $this, 'render_success_email_body_field' ),
+			$page_communication,
+			'catch_the_ace_success_email_section'
+		);
+
+		\add_settings_section(
+			'catch_the_ace_ticket_email_section',
+			\__( 'Ticket Delivery Email', 'ace-the-catch' ),
+			'__return_false',
+			$page_communication
+		);
+
+		\add_settings_field(
+			self::OPTION_TICKET_EMAIL_SUBJECT,
+			\__( 'Email Subject', 'ace-the-catch' ),
+			array( $this, 'render_ticket_email_subject_field' ),
+			$page_communication,
+			'catch_the_ace_ticket_email_section'
+		);
+
+		\add_settings_field(
+			self::OPTION_TICKET_EMAIL_BODY,
+			\__( 'Email Body', 'ace-the-catch' ),
+			array( $this, 'render_ticket_email_body_field' ),
+			$page_communication,
+			'catch_the_ace_ticket_email_section'
 		);
 	}
 
@@ -227,6 +403,26 @@ class CatchTheAceSettings {
 	 * @return string
 	 */
 	public function sanitize_outside_message( $value ): string {
+		return \wp_kses_post( (string) $value );
+	}
+
+	/**
+	 * Sanitize email subject.
+	 *
+	 * @param mixed $value Incoming value.
+	 * @return string
+	 */
+	public function sanitize_email_subject( $value ): string {
+		return \sanitize_text_field( (string) $value );
+	}
+
+	/**
+	 * Sanitize WYSIWYG email HTML.
+	 *
+	 * @param mixed $value Incoming value.
+	 * @return string
+	 */
+	public function sanitize_email_html( $value ): string {
 		return \wp_kses_post( (string) $value );
 	}
 
@@ -330,6 +526,46 @@ class CatchTheAceSettings {
 		echo '<p class="description">' . \esc_html__( 'Message shown to visitors outside Ontario.', 'ace-the-catch' ) . '</p>';
 	}
 
+	public function render_success_email_subject_field(): void {
+		$value = \get_option( self::OPTION_SUCCESS_EMAIL_SUBJECT, '' );
+		echo '<input type="text" class="regular-text" name="' . \esc_attr( self::OPTION_SUCCESS_EMAIL_SUBJECT ) . '" value="' . \esc_attr( (string) $value ) . '" />';
+		echo '<p class="description">' . \esc_html__( 'Subject line for the successful transaction email.', 'ace-the-catch' ) . '</p>';
+	}
+
+	public function render_success_email_body_field(): void {
+		$value     = \get_option( self::OPTION_SUCCESS_EMAIL_BODY, '' );
+		$editor_id = self::OPTION_SUCCESS_EMAIL_BODY;
+		\wp_editor(
+			$value,
+			$editor_id,
+			array(
+				'textarea_name' => self::OPTION_SUCCESS_EMAIL_BODY,
+				'textarea_rows' => 8,
+			)
+		);
+		echo '<p class="description">' . \esc_html__( 'Body content for the successful transaction email.', 'ace-the-catch' ) . '</p>';
+	}
+
+	public function render_ticket_email_subject_field(): void {
+		$value = \get_option( self::OPTION_TICKET_EMAIL_SUBJECT, '' );
+		echo '<input type="text" class="regular-text" name="' . \esc_attr( self::OPTION_TICKET_EMAIL_SUBJECT ) . '" value="' . \esc_attr( (string) $value ) . '" />';
+		echo '<p class="description">' . \esc_html__( 'Subject line for the ticket delivery email.', 'ace-the-catch' ) . '</p>';
+	}
+
+	public function render_ticket_email_body_field(): void {
+		$value     = \get_option( self::OPTION_TICKET_EMAIL_BODY, '' );
+		$editor_id = self::OPTION_TICKET_EMAIL_BODY;
+		\wp_editor(
+			$value,
+			$editor_id,
+			array(
+				'textarea_name' => self::OPTION_TICKET_EMAIL_BODY,
+				'textarea_rows' => 8,
+			)
+		);
+		echo '<p class="description">' . \esc_html__( 'Body content for the ticket delivery email.', 'ace-the-catch' ) . '</p>';
+	}
+
 	public function render_payment_processor_field(): void {
 		$current    = \get_option( self::OPTION_PAYMENT_PROC, '' );
 		$configs    = \get_option( self::OPTION_PAYMENT_PROC_CFG, array() );
@@ -356,15 +592,25 @@ class CatchTheAceSettings {
 		$options    = $this->get_geo_locator_options();
 		$field_defs = $this->get_geo_locator_field_defs();
 
+		$provider_notes = array(
+			OntarioBrowserGeoLocator::ID => '<p class="description">' . \sprintf(
+				/* translators: 1: license link open, 2: license link close */
+				\__( 'Attribution: Contains information licensed under the %1$sOpen Government Licence – Ontario%2$s.', 'ace-the-catch' ),
+				'<a href="https://www.ontario.ca/page/open-government-licence-ontario" target="_blank" rel="noopener noreferrer">',
+				'</a>'
+			) . '</p>',
+		);
+
 		$this->render_provider_cards(
 			array(
-				'title'       => \__( 'GeoIP Locator', 'ace-the-catch' ),
+				'title'       => \__( 'Geo Locator', 'ace-the-catch' ),
 				'option_name' => self::OPTION_GEO_LOCATOR,
 				'config_name' => self::OPTION_GEO_LOCATOR_CFG,
 				'selected'    => $current,
 				'options'     => $options,
 				'configs'     => \is_array( $configs ) ? $configs : array(),
 				'field_defs'  => $field_defs,
+				'provider_notes' => $provider_notes,
 				'help'        => \__( 'Select a locator and configure its credentials if required (e.g., API keys).', 'ace-the-catch' ),
 			)
 		);
@@ -410,7 +656,31 @@ class CatchTheAceSettings {
 	 * @return array<string,array<string,array>>
 	 */
 	private function get_payment_processor_field_defs(): array {
-		$defs = \apply_filters( 'ace_the_catch_payment_processor_fields', array() );
+		$defs = \apply_filters(
+			'ace_the_catch_payment_processor_fields',
+			array(
+				'stripe' => array(
+					'publishable_key' => array(
+						'label'       => \__( 'Publishable Key', 'ace-the-catch' ),
+						'type'        => 'text',
+						'placeholder' => '',
+						'description' => \__( 'Stripe publishable key used by Stripe.js.', 'ace-the-catch' ),
+					),
+					'secret_key'      => array(
+						'label'       => \__( 'Secret Key', 'ace-the-catch' ),
+						'type'        => 'password',
+						'placeholder' => '',
+						'description' => \__( 'Stripe secret key for server-side charges.', 'ace-the-catch' ),
+					),
+					'currency'        => array(
+						'label'            => \__( 'Currency three-letter ISO code', 'ace-the-catch' ),
+						'type'             => 'text',
+						'placeholder'      => 'CAD',
+						'description_html' => \__( 'Three-letter currency code as defined by <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO 4217</a>. Only select <a href="https://stripe.com/docs/currencies">codes supported by Stripe</a>.', 'ace-the-catch' ),
+					),
+				),
+			)
+		);
 		return \is_array( $defs ) ? $defs : array();
 	}
 
@@ -479,6 +749,7 @@ class CatchTheAceSettings {
 		$options     = $args['options'] ?? array();
 		$configs     = $args['configs'] ?? array();
 		$field_defs  = $args['field_defs'] ?? array();
+		$provider_notes = $args['provider_notes'] ?? array();
 		$help        = $args['help'] ?? '';
 
 		if ( empty( $options ) ) {
@@ -509,6 +780,7 @@ class CatchTheAceSettings {
 					$type        = $field['type'] ?? 'text';
 					$placeholder = $field['placeholder'] ?? '';
 					$desc        = $field['description'] ?? '';
+					$desc_html   = $field['description_html'] ?? '';
 					$value       = isset( $provider_config[ $field_key ] ) ? $provider_config[ $field_key ] : '';
 
 					echo '<div class="cta-provider-card__field">';
@@ -527,7 +799,9 @@ class CatchTheAceSettings {
 						\esc_attr( $value ),
 						\esc_attr( $placeholder )
 					);
-					if ( $desc ) {
+					if ( $desc_html ) {
+						echo '<p class="description">' . \wp_kses_post( (string) $desc_html ) . '</p>';
+					} elseif ( $desc ) {
 						echo '<p class="description">' . \esc_html( $desc ) . '</p>';
 					}
 					echo '</div>';
@@ -535,6 +809,11 @@ class CatchTheAceSettings {
 				echo '</div>';
 			} else {
 				echo '<p class="description">' . \esc_html__( 'No configuration required.', 'ace-the-catch' ) . '</p>';
+			}
+
+			$note_html = ( \is_array( $provider_notes ) && isset( $provider_notes[ $key ] ) ) ? (string) $provider_notes[ $key ] : '';
+			if ( $note_html ) {
+				echo '<div class="cta-provider-card__note">' . \wp_kses_post( $note_html ) . '</div>';
 			}
 
 			echo '</div>';
@@ -555,13 +834,28 @@ class CatchTheAceSettings {
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
+
+		$tabs = $this->get_tabs();
+		$current_tab = $this->get_current_tab();
+		$page_id = $this->get_settings_page_for_tab( $current_tab );
+		$settings_group = $this->get_settings_group_for_tab( $current_tab );
+		$base_url = \admin_url( 'edit.php?post_type=catch-the-ace&page=' . self::MENU_SLUG );
 		?>
 		<div class="wrap">
 			<h1><?php \esc_html_e( 'Catch the Ace Settings', 'ace-the-catch' ); ?></h1>
+			<h2 class="nav-tab-wrapper">
+				<?php foreach ( $tabs as $tab_key => $tab_label ) : ?>
+					<?php
+					$url = \add_query_arg( 'tab', $tab_key, $base_url );
+					$classes = 'nav-tab' . ( $current_tab === $tab_key ? ' nav-tab-active' : '' );
+					?>
+					<a href="<?php echo \esc_url( $url ); ?>" class="<?php echo \esc_attr( $classes ); ?>"><?php echo \esc_html( $tab_label ); ?></a>
+				<?php endforeach; ?>
+			</h2>
 			<form method="post" action="options.php">
 				<?php
-				\settings_fields( self::OPTION_GROUP );
-				\do_settings_sections( self::MENU_SLUG );
+				\settings_fields( $settings_group );
+				\do_settings_sections( $page_id );
 				\submit_button();
 				?>
 			</form>
